@@ -1,0 +1,13 @@
+prefix=D:/apps/Qt/Qt5.12.9/5.12.9/mingw73_64
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: qmqtt
+Description: qmqtt module
+Version: 1.0.0
+Libs: -L${libdir} -lqmqttd 
+Cflags: -DQT_QMQTT_LIB -I${includedir}/qmqtt -I${includedir}
+Requires: Qt5Core Qt5Network
+
