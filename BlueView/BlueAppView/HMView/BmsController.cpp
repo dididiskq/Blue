@@ -14,8 +14,19 @@ BmsController::BmsController(QObject *parent)
             });
     sendTimer.setInterval(150);
     connect(&sendTimer, &QTimer::timeout, this, &BmsController::sendMsgByQueue);
-}
 
+    m_writeTimeoutTimer.setSingleShot(true);
+    connect(&m_writeTimeoutTimer, &QTimer::timeout, this, &BmsController::onWriteTimeout);
+}
+void BmsController::onWriteTimeout()
+{
+    if (m_waitingWriteResponse)
+    {
+        m_waitingWriteResponse = false;
+        sendTimer.start(); // 恢复读取队列
+        emit writeOperationCompleted(false, "操作超时");
+    }
+}
 BmsController::~BmsController()
 {
     // 释放所有服务对象
@@ -48,7 +59,7 @@ void BmsController::searchCharacteristic()
     if (currentService && currentService->serviceUuid() == SERVICE_UUID)
     {
         QList<QLowEnergyCharacteristic> chars = currentService->characteristics();
-        // qDebug()<<"333";
+
         foreach (const QLowEnergyCharacteristic &c, chars)
         {
             if (!c.isValid()) continue;
@@ -91,6 +102,7 @@ void BmsController::connectBlue(const QString addr)
                          }, Qt::SingleShotConnection);
 
         mController->disconnectFromDevice();
+        isConnected = false;
         return; // 等待断开完成
     }
 
@@ -123,48 +135,206 @@ void BmsController::connectBlue(const QString addr)
     });//断开连接
     mController->connectToDevice();//建立连接
 }
+//写数据函数
+void BmsController::viewWriteMessage(const QVariantMap &op)
+{
+    if(isConnected == false)
+    {
+        return;
+    }
+    QByteArray array;
+    QVariantMap v;
+    // 获取用户输入（假设通过QSpinBox）
 
+    v = op;
+    v["funcCode"] = 0x10;
+    array = protocal.byte(v);
+    qDebug()<<"发送报文：" << byteArrayToHexStr(array);
+
+    // 暂停读取队列
+    sendTimer.stop();
+    if (currentService && m_Characteristic[0].isValid())
+    {
+
+        m_waitingWriteResponse = true;
+        m_writeTimeoutTimer.start(5000); // 5秒超时
+        currentService->writeCharacteristic(m_Characteristic[0], array, QLowEnergyService::WriteWithoutResponse);
+    }
+    else
+    {
+        emit writeOperationCompleted(false, "服务或特征无效");
+        sendTimer.start(); // 恢复队列
+    }
+}
+//读数据
 void BmsController::viewMessage(const int type)
 {
+    if(isConnected == false)
+    {
+        return;
+    }
     //调用协议
     QByteArray array;
     QVariantMap v;
-    if(type == 14)
-    {
-        //电池健康、电量
-        v["funcCode"] = 0x03;
-        v["startAddr"] = 0x0014;
-        v["regCount"] = 1;
-    }
-    else if(type == 4)//电压
-    {
-        //电池健康、电量
-        v["funcCode"] = 0x03;
-        v["startAddr"] = 0x0004;
-        v["regCount"] = 2;
-    }
-    else if(type == 6)//电流
-    {
-        //电池健康、电量
-        v["funcCode"] = 0x03;
-        v["startAddr"] = 0x0006;
-        v["regCount"] = 2;
-    }
-    else if(type == 12)//充放电状态
-    {
-        //电池健康、电量
-        v["funcCode"] = 0x03;
-        v["startAddr"] = 0x000C;
-        v["regCount"] = 2;
-    }
-    else if(type == 18)
+    if(type >= 0)//大于零的读数据
     {
         v["funcCode"] = 0x03;
-        v["startAddr"] = 0x0018;
-        v["regCount"] = 1;
+        if(type == 0)
+        {
+            //电池健康、电量
+            v["startAddr"] = 0x0000;
+            v["regCount"] = 1;
+        }
+        else if(type == 1)
+        {
+            //电池健康、电量
+            v["startAddr"] = 0x0001;
+            v["regCount"] = 1;
+        }
+        else if(type == 2)
+        {
+            //电池健康、电量
+            v["startAddr"] = 0x0002;
+            v["regCount"] = 1;
+        }
+        else if(type == 3)
+        {
+            //电池健康、电量
+            v["startAddr"] = 0x0003;
+            v["regCount"] = 1;
+        }
+        else if(type == 4)//电压
+        {
+            //电池健康、电量
+            v["startAddr"] = 0x0004;
+            v["regCount"] = 2;
+        }
+        else if(type == 6)//电流
+        {
+            //电池健康、电量
+            v["startAddr"] = 0x0006;
+            v["regCount"] = 2;
+        }
+        else if(type == 8)//电流
+        {
+            //电池健康、电量
+            v["startAddr"] = 0x0008;
+            v["regCount"] = 2;
+        }
+        else if(type == 10)//电流
+        {
+            v["startAddr"] = 0x000A;
+            v["regCount"] = 2;
+        }
+        else if(type == 12)//电流
+        {
+            v["startAddr"] = 0x000C;
+            v["regCount"] = 2;
+        }
+        else if(type == 14)
+        {
+            v["startAddr"] = 0x000E;
+            v["regCount"] = 1;
+        }
+        else if(type == 15)
+        {
+            v["startAddr"] = 0x000F;
+            v["regCount"] = 1;
+        }
+        else if(type == 16)
+        {
+            v["startAddr"] = 0x0010;
+            v["regCount"] = 1;
+        }
+        else if(type == 17)
+        {
+            v["startAddr"] = 0x0011;
+            v["regCount"] = 1;
+        }
+        else if(type == 18)
+        {
+            v["startAddr"] = 0x0012;
+            v["regCount"] = 1;
+        }
+        else if(type == 19)
+        {
+            v["startAddr"] = 0x0013;
+            v["regCount"] = 1;
+        }
+        else if(type == 20)
+        {
+            v["startAddr"] = 0x0014;
+            v["regCount"] = 1;
+        }
+        else if(type == 21)
+        {
+            v["startAddr"] = 0x0015;
+            v["regCount"] = 1;
+        }
+        else if(type == 22)
+        {
+            v["startAddr"] = 0x0016;
+            v["regCount"] = 1;
+        }
+        else if(type == 23)
+        {
+            v["startAddr"] = 0x0017;
+            v["regCount"] = 1;
+        }
+        else if(type == 24)
+        {
+            v["startAddr"] = 0x0018;
+            v["regCount"] = 1;
+        }
+        else if(type == 25)
+        {
+            v["startAddr"] = 0x0019;
+            v["regCount"] = 1;
+        }
+        else if(type == 26)
+        {
+            v["startAddr"] = 0x001A;
+            v["regCount"] = 1;
+        }
+        else if(type == 27)
+        {
+            v["startAddr"] = 0x001B;
+            v["regCount"] = 1;
+        }
+        else if(type == 28)
+        {
+            v["startAddr"] = 0x001C;
+            v["regCount"] = 1;
+        }
+        else if(type == 29)
+        {
+            v["startAddr"] = 0x001D;
+            v["regCount"] = 1;
+        }
+        else if(type == 30)
+        {
+            v["startAddr"] = 0x001E;
+            v["regCount"] = 1;
+        }
+        else if(type == 31)
+        {
+            v["startAddr"] = 0x001F;
+            v["regCount"] = 1;
+        }
+        else if(type == 518)
+        {
+            v["startAddr"] = 0x206;
+            v["regCount"] = 1;
+        }
+        else if(type >= 32 && type <= 63)//单体电池
+        {
+            v["startAddr"] = type;
+            v["regCount"] = 1;
+        }
     }
     array = protocal.byte(v);
     SendMsg(array);
+
 }
 QByteArray createReadSOCRequest()
 {
@@ -185,19 +355,11 @@ QByteArray createReadSOCRequest()
 
 void BmsController::SendMsg(const QByteArray& array)
 {
-    // QLowEnergyService::WriteMode mode = QLowEnergyService::WriteWithResponse;
-    // //如果特性支持“无响应写入”，则将模式改为 WriteWithoutResponse。此模式不等待设备确认，传输更快但不可靠
-    // if (m_Characteristic[0].properties() & QLowEnergyCharacteristic::WriteNoResponse)
-    // {
-    //     mode = QLowEnergyService::WriteWithoutResponse;
-    // }
-
     commandQueue.enqueue(array);
     if(!sendTimer.isActive())
     {
         sendTimer.start();
     }
-    // currentService->writeCharacteristic(m_Characteristic[0], array, mode);
 }
 
 void BmsController::sendMsgByQueue()
@@ -226,7 +388,12 @@ void BmsController::onDescriptorWritten(const QLowEnergyDescriptor &descriptor, 
         {
             // 通知已启用
             qDebug()<<"通知已经启用";
-            selfObj->selfViewCommand->selfView.context("HMStmView")->mySignal("2");
+            isConnected = true;
+            // selfObj->selfViewCommand->selfView.context("HMStmView")->mySignal("2");
+            for(const auto & it: initCmdList)
+            {
+                viewMessage(it);
+            }
         }
         else
         {
@@ -326,7 +493,7 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
     {
         qDebug() << "收到通知数据:" << value.toHex(' ');
         QVariantMap map = protocal.parse(value);
-        // qDebug()<<"数据解析内容："<<map;
+        qDebug()<<"数据解析内容："<<map;
 
         if(map.value("error", -1).toInt() == 1)
         {
@@ -340,6 +507,29 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
         }
 
         quint16 funcCode = map.value("funcCode").toUInt();
+
+        // 处理写响应
+        if (map.value("writeOrread").toUInt() == 0x10)// 写响应功能码
+        {
+            if (m_waitingWriteResponse)
+            {
+                m_writeTimeoutTimer.stop();
+                m_waitingWriteResponse = false;
+                sendTimer.start(); // 恢复读取队列
+                qDebug()<<"改写成功";
+                // 检查响应是否正确
+                if (false)
+                {
+                    emit writeOperationCompleted(true, "");
+                    // 更新相关数据
+                    // 示例：刷新SOC数据
+                }
+                else
+                {
+                    emit writeOperationCompleted(false, "设备返回错误");
+                }
+            }
+        }
 
         if(funcCode == 0x0014)
         {
@@ -365,6 +555,109 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
             selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("celllType", map.value("celllType"));
             selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("cellNum", map.value("cellNum"));
         }
+        else if(funcCode == 0x0000)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("mosTemperature", map.value("mosTemp"));
+        }
+        else if(funcCode == 0x0001)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("temperature1", map.value("cell_temp1"));
+        }
+        else if(funcCode == 0x0002)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("temperature2", map.value("cell_temp2"));
+        }
+        else if(funcCode == 0x0003)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("temperature3", map.value("cell_temp3"));
+        }
+        else if(funcCode == 0x0008)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("remaining_capacity", map.value("capacity"));
+        }
+        else if(funcCode == 0x000A)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("balStatus", map.value("balStatus"));
+        }
+        else if(funcCode == 0x000E)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("alarmlStatus", map.value("alarm_status"));
+        }
+        else if(funcCode == 0x000F)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("packStatus", map.value("pack_status"));
+        }
+        else if(funcCode == 0x0010)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("secondYa", map.value("secondary_voltage"));
+        }
+        else if(funcCode == 0x0011)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("secondLiu", map.value("secondary_current"));
+        }
+        else if(funcCode == 0x0012)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("secondTemperature", map.value("secondary_temperature"));
+        }
+        else if(funcCode == 0x0013)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("mainVer", map.value("mainVer"));
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("subVer", map.value("subVer"));
+        }
+        else if(funcCode == 0x0015)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("rtcY", map.value("rtc_year"));
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("rtcM", map.value("rtc_month"));
+        }
+        else if(funcCode == 0x0016)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("rtcD", map.value("rtc_day"));
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("rtcH", map.value("rtc_hour"));
+        }
+        else if(funcCode == 0x0017)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("rtcM1", map.value("rtc_minute"));
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("rtcS", map.value("rtc_second"));
+        }
+        else if(funcCode == 0x0019)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("afeNum", map.value("afeNum"));
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("cusNum", map.value("cusNum"));
+        }
+        else if(funcCode == 0x001A)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("cycles_number", map.value("cycles_number"));
+        }
+        else if(funcCode == 0x001B)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("fcc", map.value("full_charge_capacity"));
+        }
+        else if(funcCode == 0x001C)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("dc", map.value("dc"));
+        }
+        else if(funcCode == 0x001D)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("maxNoElect", map.value("maxNoElect"));
+        }
+        else if(funcCode == 0x001E)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("majNoElect", map.value("majNoElect"));
+        }
+        else if(funcCode == 0x001F)
+        {
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("functionConfig", map.value("functionConfig"));
+        }
+        else if(funcCode >= 0x0020 && funcCode <= 0x003F)
+        {
+            cellVlist.append(map.value("cellV"));
+            if(cellVlist.size() == 32)
+            {
+                selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("cellVlist", cellVlist);
+                cellVlist.clear();
+            }
+        }
+
     }
 }
 

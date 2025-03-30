@@ -5,25 +5,28 @@ import "./js" as HMFunc
 import QtQuick.Window
 Item
 {
+
     TabBar
     {
         id: tabBar
         // focus: true
+
+        visible: srcDict.isShowTool
+        z: 1
         width: parent.width
         contentHeight: parent.height * 0.1
         anchors.bottom: parent.bottom
         currentIndex: swipeView.currentIndex
-        background: Rectangle
-        {
-            color: "#d6e1c2" // 标签按钮背景透明
-        }
+
         STabButton
         {
             id: btnMain
-            buttonText: "首页"
+            buttonText: "设置"
+            sour.source: "../res/setIcon.svg"
+            sourP.source: "../res/setIconP.svg"
             onClicked:
             {
-                currIndex = 1
+                swipeView.currentIndex = 0
                 devPage.realDrawer.close()
             }
 
@@ -31,10 +34,52 @@ Item
         STabButton
         {
             id: btnDevice
-            buttonText: "设备"
+            buttonText: "实时"
+            background: Rectangle
+            {
+                id:colorRect
+                radius: 20
+                color: "transparent"
+                // border.color: "red"
+                Image
+                {
+                    id: name1
+                    height: srcDict.scaled(55)
+                    width: srcDict.scaled(55)
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.leftMargin: srcDict.scaled(40)
+                    visible: true
+                    source: "res/cellIconP.svg"
+                }
+                Image
+                {
+                    id: name2
+                    height: srcDict.scaled(55)
+                    width: srcDict.scaled(55)
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.leftMargin: srcDict.scaled(40)
+                    visible: false
+                    source: "res/cellIcon.svg"
+                }
+            }
+            onFocusChanged:
+            {
+                if (btnDevice.focus)
+                {
+                    name2.visible = true
+                    name1.visible = false
+                }
+                else
+                {
+                    name1.visible = true
+                    name2.visible = false
+                }
+            }
             onClicked:
             {
-                currIndex = 2
+                swipeView.currentIndex = 1
                 devPage.realDrawer.close()
             }
         }
@@ -42,9 +87,11 @@ Item
         {
             id: btnMine
             buttonText: "我的"
+            sour.source: "../res/mineIcon.svg"
+            sourP.source: "../res/mineIconP.svg"
             onClicked:
             {
-                currIndex = 3
+                swipeView.currentIndex = 2
                 devPage.realDrawer.close()
             }
 
@@ -53,16 +100,21 @@ Item
     SwipeView
     {
         id: swipeView
-        currentIndex: tabBar.currentIndex
+        currentIndex: 1
+        // currentIndex: tabBar.currentIndex
         width: parent.width
         anchors.top: parent.top
         height: parent.height - tabBar.height
         interactive: false
-
+        DevicePage
+        {
+            id: devPage
+        }
         MainPage
         {
-            onHidenTabbar: (type)=>
+            onHidenTabbar: (type) =>
             {
+                console.log("收到信号参数:", type)
                 if(type === 1)
                 {
                     tabBar.visible = false
@@ -71,13 +123,9 @@ Item
                 {
                     tabBar.visible = true
                 }
-
             }
         }
-        DevicePage
-        {
-            id: devPage
-        }
+
         MinePage
         {
 

@@ -5,23 +5,67 @@ import QtQml 2.2
 
 QtObject
 {
+    property bool isShowTool: true
+    property string conectedBlueName: ""
+
+    property real designWidth: 390  // 基准屏幕宽度
+    property real designHeight: 844 // 基准屏幕高度
+
+    // 计算缩放比例（取宽高比例的最小值，保持元素比例不失真）
+    readonly property real scaleRatio: Math.min(width / designWidth, height / designHeight)
+
     property int winWidth: fields["winWidth"]
     property int winHeight: fields["winHeight"]
     property variant isShowVoiceImg: fields["isShow"]
-    property variant blueDataReal: fields["blueData"]
+    property variant blueDataReal: fields["blueData"] //搜寻蓝牙列表
+    property var codeData: fields["codeData"]  //扫码连接蓝牙名称
 
-    property var soc: fields["soc"]
-    property var soh: fields["soh"]
-    property var electYa: fields["electYa"]
-    property var electLiu: fields["electLiu"]
-    property var cMos: fields["cMos"]
-    property var fMos: fields["fMos"]
-    property var celllType: fields["celllType"]
-    property var cellNum: fields["cellNum"]
-    property var codeData: fields["codeData"]
+    property var electYa: fields["electYa"] //总电压
+    property var electLiu: fields["electLiu"] //总电流
+    property var cMos: fields["cMos"] //充电开关
+    property var fMos: fields["fMos"] //放电开关
+    property var mosTemperature: fields["mosTemperature"] //mos温度1
+    property var temperature1: fields["temperature1"] //电池温度1
+    property var temperature2: fields["temperature2"] //电池温度2
+    property var temperature3: fields["temperature3"] //电池温度3
+    property var remaining_capacity: fields["remaining_capacity"] //剩余容量
+    property var balStatus: fields["balStatus"] //平衡状态
+    property var afeStatus: fields["afeStatus"] //AFE状态
+    property var alarmlStatus: fields["alarmlStatus"] //报警状态
+    property var packStatus: fields["packStatus"] //电池状态
+    property var secondYa: fields["secondYa"] //二次电压
+    property var secondLiu: fields["secondLiu"] //二次电流
+    property var secondTemperature: fields["secondTemperature"] //二次温度
+    property var mainVer: fields["mainVer"] //主版本
+    property var subVer: fields["subVer"] //次版本
+    property var soc: fields["soc"] //总电量
+    property var soh: fields["soh"] //健康度
+    property var rtcY: fields["rtcY"] //rtc年月
+    property var rtcM: fields["rtcM"] //rtc年月
+    property var rtcD: fields["rtcD"] //rtc日时
+    property var rtcH: fields["rtcH"] //rtc日时
+    property var rtcM1: fields["rtcM1"] //rtc分秒
+    property var rtcS: fields["rtcS"] //rtc分秒
+    property var celllType: fields["celllType"] //电池类型
+    property var cellNum: fields["cellNum"] //电池串数
+    property var afeNum: fields["afeNum"] //模拟前端代号
+    property var cusNum: fields["cusNum"] //客户代号
+    property var cycles_number: fields["cycles_number"] //循环次数
+    property var fcc: fields["fcc"] //满充容量
+    property var dc: fields["dc"] //设计容量
+    property var maxNoElect: fields["maxNoElect"] //最大的未充电间隔时间
+    property var majNoElect: fields["majNoElect"] //最近的未充电间隔时间
+    property var functionConfig: fields["functionConfig"] //功能开关配置寄存器
+    property var cellVlist: fields["cellVlist"] //功能开关配置寄存器
 
-    property bool isShowTool: true
 
+
+
+    // 动态缩放函数
+    function scaled(value)
+    {
+        return value * scaleRatio;
+    }
     function startSearch()
     {
         var data = {}
@@ -33,6 +77,15 @@ QtObject
         data["type"] = type
         putOp("send.to.blue", data)
     }
+    function writeToBlue(type, v)
+    {
+        var data = {}
+        data["type"] = type
+        data["startAddr"] = type
+        data["inputData"] = v
+        putOp("send.to.blue", data)
+    }
+
     function sendCodeData(codeData)
     {
         var data = {}

@@ -5,37 +5,58 @@ TabButton
 {
 
     id:tabbutton1
-    property int  buttonTextPointSize: 15
+    property int  buttonTextPointSize: 10
     property color pressBackgroundColor: "lightgreen"
     property color releaseBackgroundColor: "transparent"
-
+    property alias sour: name1
+    property alias sourP: name2
     property string buttonText: ""
     background: Rectangle
     {
         id:colorRect
-        color: activeFocus ? "lightgreen" : "transparent"
-        border.color:"royalblue"
-        border.width: 1
         radius: 20
-    }
-    Label
-    {
-        anchors.centerIn: parent
-        text: buttonText
-        font.pointSize: buttonTextPointSize
+        color: "transparent"
+        Image
+        {
+            id: name1
+            height: srcDict.scaled(40)
+            width: srcDict.scaled(40)
+            anchors.centerIn: parent
+            visible: true
+            source: ""
+        }
+        Image
+        {
+            id: name2
+            height: srcDict.scaled(40)
+            width: srcDict.scaled(40)
+            anchors.centerIn: parent
+            visible: false
+            source: ""
+        }
     }
     onFocusChanged:
     {
         if (tabbutton1.focus)
         {
-            // tabbutton1.scale = 1.2
-            colorRect.color = "lightgreen"
+            name2.visible = true
+            name1.visible = false
         }
         else
         {
-            // tabbutton1.scale = 1.0
-            colorRect.color = "transparent"
+            name1.visible = true
+            name2.visible = false
         }
     }
+    Label
+    {
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: srcDict.scaled(8)
+        anchors.left: parent.left
+        anchors.leftMargin: srcDict.scaled(52)
+        text: buttonText
+        font.pointSize: buttonTextPointSize
+    }
+
 
 }

@@ -58,6 +58,7 @@ signals:
     void startBle();
     void sendBlueSlot(const int type);
     void connectBlueSlot(const QString addr);
+    void writeBlueSlot(const QVariantMap &op);
 public:
     CHMModule *selfObj;
     CHMView selfView;                                             // 界面对象

@@ -5,158 +5,22 @@ Page
 {
     Component.onCompleted:
     {
-        srcDict.isShowTool = false
-    }
-    Button
-    {
-        height: 50
-        width: 130
-        text: "< 系统参数"
-        x: 0
-        y: 0
-        font.pixelSize: 20
-        onClicked:
-        {
-            stackView2.pop()
-            srcDict.isShowTool = true
-        }
-        background: Rectangle
-        {
-            color: "transparent"
-        }
-    }
-    Rectangle
-    {
-        width: parent.width - 100
-        height: 150
-        x: 50
-        y: 186
-        border.color: "red"
-        // 参数表格
-        GridLayout
-        {
-            anchors.fill: parent
-            columns: 3
-            rows: 5
-            columnSpacing: 0  // 消除列间距
-            rowSpacing: 0    // 消除行间距
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-                Label
-                {
-                    anchors.centerIn: parent
-                    text: "项目"
-                }
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-                Label
-                {
-                    anchors.centerIn: parent
-                    text: "参数"
-                }
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-                Label
-                {
-                    anchors.centerIn: parent
-                    text: "设定"
-                }
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-                Label
-                {
-                    anchors.centerIn: parent
-                    text: "电池串数"
-                }
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-                Label
-                {
-                    anchors.centerIn: parent
-                    text: "电池容量"
-                }
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
-            Rectangle
-            {
-                height: parent.height / 5
-                width: parent.width / 3
-                border.color: "red"
-            }
 
-        }
+    }
+    title: "系统参数"
+    ParameterPage
+    {
+        width: parent.width
+        paramList: [
+            { name: "额定充电电压", value: 66, unit: "0.1V" },
+            { name: "额定充电电流", value: 66, unit: "0.1A" },
+            { name: "休眠延时",  value: -66, unit: "s" },
+            { name: "关机延时",  value: -66, unit: "s" },
+            { name: "满充延时", value: 66, unit: "s" },
+            { name: "满充电压", value: 66, unit: "mV" },
+            { name: "满充电流",  value: -66, unit: "mA" },
+            { name: "零电流显示阈值",  value: -66, unit: "mA" },
+        ]
     }
 }
 

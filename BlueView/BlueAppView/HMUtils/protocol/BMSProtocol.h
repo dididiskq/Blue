@@ -1,10 +1,13 @@
 #ifndef BMSPROTOCOL_H
 #define BMSPROTOCOL_H
 
-#include "hmprotocol.h"
+// #include "hmprotocol.h"
+#include<QObject>
 #include <QByteArray>
 #include <QtEndian>
 #include<QMap>
+#include <QString>
+#include <QVariantMap>
 
 static const unsigned short crc16tab[256] = {
     0x0000,0x1021,0x2042,0x3063,0x4084,0x50a5,0x60c6,0x70e7,
@@ -82,10 +85,18 @@ public:
     QVariantMap deal_1D(const QByteArray& v, int dataLen); //最大未充电间隔时间
     QVariantMap deal_1E(const QByteArray& v, int dataLen); //最近未充电间隔时间
     QVariantMap deal_1F(const QByteArray& v, int dataLen); //功能开关配置寄存器
-    QVariantMap deal_20(const QByteArray& v, int dataLen); //20-3F代表1-32每节电池电压
+    QVariantMap deal_206(const QByteArray& v, int dataLen);
+    QVariantMap paseCellVs(quint16 cmd, const QByteArray &data);
     //写命令回调函数
-
     QVariantMap procCommand(int dataLen, quint16 cmd, const QByteArray &data);
+
+
+    //写组转回调
+    QByteArray byte_200(const QVariantMap& data);
+    QByteArray byte_string(const QVariantMap& data);
+    QByteArray byte_int16and1(const QVariantMap& data);
+    QByteArray byte_uint32and2(const QVariantMap& data);
+
 
 private:
     // CRC16校验计算
@@ -97,8 +108,11 @@ private:
     // 数据类型转换工具
     QVariant parseRegisterData(quint16 address, const QByteArray &data) const;
 
-    //命令映射表
-    QMap<quint16, std::function<QVariantMap(const QByteArray&, int)>> commands;
+    //解析命令映射表
+    QHash<quint16, std::function<QVariantMap(const QByteArray&, int)>> commands;
+
+    //组装命令映射表
+    QHash<quint16, std::function<QByteArray(const QVariantMap&)>> writeByteCommands;
 };
 
 #endif // BMSPROTOCOL_H

@@ -26,13 +26,13 @@ Page
             if(message === "1")
             {
                 print(codeData + "-已连接")
-                myLoader.source = "./component/MainPage.qml"
+                // myLoader.source = "./component/MainPage.qml"
             }
         }
     }
     Component.onCompleted:
     {
-        camera.start()
+        // camera.start()
     }
 
     Button
@@ -41,8 +41,8 @@ Page
         text: "返回"
         onClicked:
         {
-            // returnPage()
-            myLoader.source = "./component/MainPage.qml"
+            returnPage()
+            // myLoader.source = "InitView.qml"
         }
     }
     CaptureSession
@@ -88,6 +88,7 @@ Page
     Rectangle
     {
         id: scanLine
+        visible: cap.camera.active
         width: parent.width
         height: 2
         color: "#00ff00" // 绿色扫描线
@@ -101,7 +102,7 @@ Page
             to: output.height
             duration: 2000  // 动画时长（毫秒）
             loops: Animation.Infinite // 无限循环
-            running: true
+            running: cap.camera.active
         }
 
         // 添加光影渐变效果（可选）
@@ -125,6 +126,7 @@ Page
         anchors.centerIn: parent
         width: 200
         height: 200
+        visible: cap.camera.active
         color: "transparent"
         border.color: "#00ff00"
         border.width: 2

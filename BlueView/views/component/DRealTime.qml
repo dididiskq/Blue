@@ -1,339 +1,155 @@
-import QtQuick 2.5
+
+import QtQuick
 import QtQuick.Controls
-Page
-{
+
+Page {
     property var soc: srcDict.soc
     property var soh: srcDict.soh
+    property var cellList: srcDict.cellVlist
     background: Rectangle
     {
-        color: "#d6e1c2"  // 设置背景颜色
-        anchors.fill: parent // 确保填充整个 Page
+        // color: "transparent"
+        color: "white"
+    }
+    title: "实时数据"
+    onCellListChanged:
+    {
+        if(cellList === undefined)
+        {
+            return
+        }
+        for (var i = 0; i < batteryModel.count; i++)
+        {
+            // console.log(i, cellList[i])
+            batteryModel.setProperty(i, "typeData", cellList[i])
+
+        }
+    }
+    ListModel {
+        id: batteryModel
+        Component.onCompleted:
+        {
+            for (var i = 0; i < 32; i++)
+            {
+
+                append({text: "" + (i + 1), imgSrc: "../res/cellCom.svg", typeData: ""})
+            }
+        }
     }
 
-    title: "实时数据"
-    Rectangle
+    // 主内容容器
+    Flickable
     {
-        border.color: "red"
-        width: parent.width
-        height: 550
-        // x: 50
-        y: 230
-        Flickable
-        {
-            id: fliclable
-            width: parent.width
-            height: parent.height
-            contentHeight: grid.height  // 关键：内容高度绑定子项总高度
-            contentWidth: grid.width
-            clip: true  // 裁剪超出区域
-            Grid
-            {
-                id: grid
-                // rows: 12 //行数
-                // columns: 3 //列数
-                width: fliclable.width
+        id: flickable
+        anchors.fill: parent
+        contentHeight: contentColumn.height // 动态计算总高度
+        clip: true
 
-                Repeater
-                {
-                    model: listModel
-                    delegate: Rectangle
-                    {
-                        height: (model.name === "title" || model.text === "") ? 40 :90
-                        width: parent.width / 4
+        Column
+        { // 垂直布局所有内容块
+            id: contentColumn
+            width: parent.width
+
+            InfoGridOne
+            {
+            }
+
+            InfoGridLang
+            {
+            }
+
+            // 电池信息
+            InfoGrid
+            {
+                title: "电池信息"
+                modelData: [
+                    {text: "总电压", source: "../res/electY.png", data: srcDict.electYa === undefined ? "" : srcDict.electYa},
+                    {text: "总电流", source: "../res/electL.png", data: srcDict.electLiu === undefined ? "" : srcDict.electLiu},
+                    {text: "压差", source: "../res/electY.png", data: srcDict.electYa === undefined ? "" : srcDict.electYa},
+                    {text: "最高电压", source: "../res/maxYa.png", data: srcDict.electYa === undefined ? "" : srcDict.electYa},
+                    {text: "最低电压", source: "../res/minYa.png", data: srcDict.electYa === undefined ? "" : srcDict.electYa},
+                    {text: "循环次数", source: "../res/electY.png", data: srcDict.cycles_number === undefined ? "" : srcDict.cycles_number},
+                    // {text: "功率", source: "../res/power.png", data: 33},
+                ]
+            }
+
+            // 温度信息模块
+            InfoGrid
+            {
+                title: "温度信息"
+                modelData: [
+                    {text: "MOS温度", source: "", data: srcDict.mosTemperature === undefined ? "" : srcDict.mosTemperature},
+                    {text: "T1温度", source: "", data: srcDict.temperature1 === undefined ? "" : srcDict.temperature1},
+                    {text: "T2温度", source: "", data: srcDict.temperature2 === undefined ? "" : srcDict.temperature2},
+                    {text: "T3温度", source: "", data: srcDict.temperature3 === undefined ? "" : srcDict.temperature3}
+                ]
+            }
+
+            // 电池单体电压
+            Rectangle
+            {
+                width: parent.width
+                height: batteryGrid.height + 40 // 标题高度
+                color: "transparent"
+
+                // 标题
+                Text {
+                    text: "单体电压"
+                    font.pixelSize: 16
+                    font.bold: true
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.margins: 10
+                }
+
+                // 电池单元专用网格布局
+                GridView {
+                    id: batteryGrid
+                    width: parent.width
+                    height: Math.ceil(model.count / 5) * cellHeight // 动态计算高度
+                    anchors.top: parent.top
+                    anchors.topMargin: 40
+                    cellWidth: width / 5   // 关键：每行5个
+                    cellHeight: 90
+                    interactive: false     // 禁用独立滚动
+
+                    model:batteryModel
+
+                    delegate: Rectangle {
+                        width: batteryGrid.cellWidth
+                        height: batteryGrid.cellHeight
+                        color: "transparent"
                         // border.color: "red"
+
                         Text
                         {
-                            id: _text1
                             text: model.text
-                            font.pixelSize: (model.name === "title") ? 16:12
-                            font.bold: (model.name === "title")
+                            font.pixelSize: 12
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            anchors.top: parent.top
                         }
+                        Text
+                        {
+                            text: model.typeData
+                            font.pixelSize: 12
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                        }
+
                         Image
                         {
-                            anchors.right: parent.right
-                            height: (model.type === "battery") ? 85 : 50
-                            width:  (model.type === "battery") ? 100 : 50
                             source: model.imgSrc
+                            // anchors.right: parent.right
+                            // anchors.verticalCenter : parent.verticalCenter
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: parent.width
+                            height: 70
                         }
                     }
                 }
             }
         }
     }
-
-
-    /*动态加载
-    Rectangle
-    {
-        border.color: "red"
-        width: 351
-        height: 466
-        x: 50
-        y: 50
-        GridView
-        {
-            id: gridView
-            anchors.fill: parent
-            cellHeight: 80
-            cellWidth: 117
-            model: listModel
-            delegate: Rectangle
-            {
-                border.color: "red"
-                height: gridView.cellHeight
-                width: gridView.cellWidth
-                Text
-                {
-                    id: _text1
-                    text: model.text
-                    font.pixelSize: 12
-                }
-            }
-        }
-    }
-    */
-    ListModel
-    {
-        id: listModel
-        ListElement
-        {
-            text: "电池信息"
-            name: "title"
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "总电压"
-            imgSrc: "../res/electY.png"
-            type: ""
-        }
-        ListElement
-        {
-            text: "电流"
-            imgSrc: "../res/electL.png"
-            type: ""
-        }
-        ListElement
-        {
-            text: "功率"
-            imgSrc: "../res/power.png"
-            type: ""
-        }
-        ListElement
-        {
-            text: "最高电压"
-            imgSrc: "../res/maxYa.png"
-            type: ""
-        }
-        ListElement
-        {
-            text: "最低电压"
-            imgSrc: "../res/minYa.png"
-            type: ""
-        }
-        ListElement
-        {
-            text: "平均电压"
-            imgSrc: "../res/average.png"
-            type: ""
-        }
-        ListElement
-        {
-            text: "压差"
-            imgSrc: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "循环次数"
-            imgSrc: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "温度信息"
-            name: "title"
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "MOS温度"
-            imgSrc: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "T1温度"
-            imgSrc: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "T2温度"
-            imgSrc: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "T3温度"
-            imgSrc: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: "单体电压"
-            name: "title"
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        ListElement
-        {
-            text: ""
-            type: ""
-        }
-        Component.onCompleted:
-        {
-            //srcDict.cellNum
-            for(var i = 0; i < 24; i++)
-            {
-                listModel.append({text: "No." + (i + 1), imgSrc: "../res/cellIcom.png", type: "battery"})
-            }
-        }
-    }
-
-
-
-    Rectangle
-    {
-        id: rectangle
-        x: 6
-        y: 6
-        width: 439
-        height: 212
-        color: "#ffffff"
-
-        Rectangle {
-            id: rectangle1
-            x: 8
-            y: 8
-            width: 200
-            height: 196
-            border.color: "red"
-            color: "#ffffff"
-
-            Label
-            {
-                x: 18
-                y: 151
-                width: 157
-                height: 30
-                text: "11:22:33:44:55:66"
-                font.pixelSize: 15
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter // 关键修改：水平居中
-                // anchors.centerIn: parent
-            }
-            Rectangle
-            {
-                width: parent.width
-                height: 130
-                border.color: "green"
-                Image
-                {
-                    x: 4
-                    y: 0
-                    anchors.fill: parent
-                    width: 192
-                    height: 108
-                    source: "../res/cellDev.png"
-                }
-                Label
-                {
-                    text: "我是电量显示"
-                    anchors.centerIn: parent
-                }
-            }
-        }
-        Rectangle
-        {
-            id: rectangle2
-            x: 233
-            y: 8
-            width: 200
-            height: 196
-            border.color: "red"
-            color: "#ffffff"
-
-        }
-
-        Rectangle {
-            border.color: "red"
-            id: rectangle3
-            x: 251
-            y: 28
-            width: 165
-            height: 48
-            color: "#ffffff"
-        }
-        Rectangle {
-            border.color: "red"
-            id: rectangle4
-            x: 251
-            y: 136
-            width: 165
-            height: 48
-            color: "#ffffff"
-        }
-        Rectangle {
-            id: rectangle5
-            border.color: "red"
-            x: 251
-            y: 82
-            width: 165
-            height: 48
-            color: "#ffffff"
-        }
-
-    }
-
-
 }

@@ -96,11 +96,14 @@ public:
 
     void searchCharacteristic();
 
-
+    void viewWriteMessage(const QVariantMap &op);
     void connectBlue(const QString addr);
 signals:
     void startBlue();
+    void writeOperationCompleted(bool success, const QString &error);
 public slots:
+    void onWriteTimeout();
+
     void viewMessage(const int type);
     void SendMsg(const QByteArray&);
     void startSearch();
@@ -151,9 +154,22 @@ private:
     QQueue<QByteArray> commandQueue;
     QTimer sendTimer;
 
-    const QBluetoothUuid SERVICE_UUID    = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E1001"));
-    const QBluetoothUuid WRITE_UUID      = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E0001"));
-    const QBluetoothUuid NOTIFY_UUID     = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E0002"));
+    const QBluetoothUuid SERVICE_UUID = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E1001"));
+    const QBluetoothUuid WRITE_UUID   = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E0001"));
+    const QBluetoothUuid NOTIFY_UUID  = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E0002"));
+
+    QTimer m_writeTimeoutTimer;
+    bool m_waitingWriteResponse;
+
+    bool isConnected = false;
+    QVariantList cellVlist;
+    QList<int> initCmdList{0, 1, 2,3,4,6,
+                            8, 10, 12,14 ,15,16,
+                            17,18,19,20,21,22,
+                            23,24,24,26,27,28,
+                            29,30,31, 32,33,34,35,36,37,38,39,40,
+                            41,42,43,44,45,46,47,48,49,50,51,52,53,54,
+                            55, 56,57,58,59,60,61,62,63};
 };
 
 #endif // BMSCONTROLLER_H

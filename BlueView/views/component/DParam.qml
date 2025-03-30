@@ -5,7 +5,7 @@ Page
     title: "参数"
     background: Rectangle
     {
-        color: "#d6e1c2"  // 设置背景颜色
+        color: "transparent"  // 设置背景颜色
         anchors.fill: parent // 确保填充整个 Page
     }
     StackView

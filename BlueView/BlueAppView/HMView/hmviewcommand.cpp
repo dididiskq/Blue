@@ -189,7 +189,14 @@ void CHMViewCommand::render_image(const QVariantMap op)
 bool CHMViewCommand::onSendToBlue(const QVariantMap &op)
 {
     int type = op.value("type", -1).toInt();
-    emit sendBlueSlot(type);
+    if(type >= 0x200)
+    {
+        emit writeBlueSlot(op);
+    }
+    else
+    {
+        emit sendBlueSlot(type);
+    }
     return true;
 }
 
