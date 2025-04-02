@@ -195,7 +195,7 @@ bool CHMViewCommand::onSendToBlue(const QVariantMap &op)
     }
     else
     {
-        emit sendBlueSlot(type);
+        emit sendBlueSlot(abs(type));
     }
     return true;
 }

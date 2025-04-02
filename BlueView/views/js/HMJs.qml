@@ -59,6 +59,29 @@ QtObject
     property var cellVlist: fields["cellVlist"] //功能开关配置寄存器
 
 
+    property var ov: fields["OV"]
+    property var ovr: fields["OVR"]
+    property var uv: fields["UV"]
+    property var uvr: fields["UVR"]
+    property var uvt: fields["UVT"]
+    property var ocd1: fields["OCD1"]
+    property var ocd2: fields["OCD2"]
+    property var ocd2t: fields["OCD2T"]
+    property var ocd2t: fields["tes"] // 短路保护电流
+    property var sct: fields["SCT"]
+    property var occ: fields["OCC"]
+    property var occt: fields["OCCT"]
+    property var sleepDelay: fields["SleepDelay"]
+    property var shutDownDelay: fields["ShutDownDelay"]
+    property var eYa: fields["eYa"]
+    property var eLiu: fields["eLiu"]
+    property var mYa: fields["mYa"]
+    property var mLiu: fields["mLiu"]
+    property var mYan: fields["mYan"]
+    property var sleepDelay: fields["SleepDelay"]
+    property var SampleRValue: fields["SampleRValue"]
+
+
 
 
     // 动态缩放函数

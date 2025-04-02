@@ -5,7 +5,9 @@ import "./js" as HMFunc
 import QtQuick.Window
 Item
 {
-
+    // 安全区域边距（通过 Screen 获取）
+    readonly property real safeAreaTop: Screen.desktopAvailableHeight - Screen.height
+    readonly property real safeAreaBottom: Screen.height - (Screen.desktopAvailableHeight + Screen.desktopAvailableY)
     TabBar
     {
         id: tabBar

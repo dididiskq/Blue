@@ -12,7 +12,7 @@ Page
     }
     header:ToolBar
     {
-        height: srcDict.scaled(50)
+        height: srcDict.scaled(80)
         background: Rectangle
         {
             anchors.fill: parent
@@ -21,6 +21,8 @@ Page
         ToolButton
         {
             // visible: srcDict.isShowTool
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
             text: stackView.depth > 1 ? "\u25C0" :"\u2630"
             font.pixelSize: 25
             onClicked:
@@ -39,7 +41,8 @@ Page
         Label
         {
             text: stackView.currentItem.title
-            anchors.centerIn: parent
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: 25
         }
     }

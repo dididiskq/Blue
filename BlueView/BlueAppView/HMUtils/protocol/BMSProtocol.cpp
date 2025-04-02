@@ -39,6 +39,43 @@ BMSProtocol::BMSProtocol(QObject *parent) : QObject(parent)
     commands[0x001F] = [this](const QByteArray& data, int dataLen) { return deal_1F(data, dataLen); };
     commands[0x206] = [this](const QByteArray& data, int dataLen) { return deal_206(data, dataLen); };
 
+    commands[0x230] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
+    commands[0x236] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
+    commands[0x23A] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
+    commands[0x246] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
+    commands[0x256] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
+    commands[0x408] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
+
+    commands[0x200] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x201] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x202] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x203] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x204] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x205] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x206] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x207] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x208] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x20A] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x20C] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x210] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x211] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x212] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x213] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x214] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x215] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x216] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x217] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x218] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x219] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x21A] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x21B] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x21C] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x21D] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x21E] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x21F] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x221] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+
+
     //写组装函数
     //寄存器数量相同，数据段类型相同
     writeByteCommands[0x200] = [this](const QVariantMap& data) { return byte_200(data); };
@@ -265,6 +302,196 @@ QVariantMap BMSProtocol::paseCellVs(quint16 cmd, const QByteArray &data)
     quint16 raw = (static_cast<quint8>(data[5]) << 8) | static_cast<quint8>(data[6]);
     double value = raw * 10.0;  // 转换为mV
     response["cellV"] = QString::number(value / 1000, 'f', 2) + " V";
+    return response;
+}
+
+QVariantMap BMSProtocol::paseString(const QByteArray& buf, int dataLen)
+{
+    QVariantMap response;
+    quint16 funcCodeH = static_cast<quint8>(buf.at(2));
+    quint16 funcCodeL = static_cast<quint8>(buf.at(3));
+    quint16 funcCode = (static_cast<quint16>(funcCodeH) << 8) | funcCodeL;
+    QString value;
+    for(int i = 5; i < buf.at(4) + 5; i++)
+    {
+        quint8 byte = static_cast<quint8>(buf.at(i));
+
+        value.append(QString("%1").arg(byte, 2, 16, QLatin1Char('0')).toUpper());
+    }
+    if(funcCode == 0x230)//SN
+    {
+        response["sn"] = value;
+    }
+    else if(funcCode == 0x236)//Manufacturer
+    {
+        response["manufacturer"] = value;
+    }
+    else if(funcCode == 0x23A)//ManufacturerMode
+    {
+        response["manufacturerMode"] = value;
+    }
+    else if(funcCode == 0x246)//CustomerName
+    {
+        response["customerName"] = value;
+    }
+    else if(funcCode == 0x24A)//CustomerMode
+    {
+        response["customerMode"] = value;
+    }
+    else if(funcCode == 0x256)//MNFDate
+    {
+        response["mnfDate"] = value;
+    }
+    else if(funcCode == 0x408)//BT
+    {
+        response["bt"] = value;
+    }
+    return response;
+}
+
+QVariantMap BMSProtocol::paseUn16And1(const QByteArray &buf, int dataLen)
+{
+    QVariantMap response;
+    quint16 funcCodeH = static_cast<quint8>(buf.at(2));
+    quint16 funcCodeL = static_cast<quint8>(buf.at(3));
+    quint16 funcCode = (static_cast<quint16>(funcCodeH) << 8) | funcCodeL;
+    quint16 raw_ = (static_cast<quint8>(buf[5]) << 8) | static_cast<quint8>(buf[6]);
+    QString raw = QString::number(static_cast<int>(raw_));
+
+    if (funcCode == 0x200) {
+        response["cellNumber"] = raw;
+        response["viewValue"] = "cellNumber";
+    }
+    else if (funcCode == 0x201) {
+        response["cellType"] = raw;
+        response["viewValue"] = "cellType";
+    }
+    else if (funcCode == 0x202) {
+        response["afeNumber"] = raw;
+        response["viewValue"] = "afeNumber";
+    }
+    else if (funcCode == 0x203) {
+        response["customNumber"] = raw;
+        response["viewValue"] = "customNumber";
+    }
+    else if (funcCode == 0x204) {
+        response[""] = raw;  // ⚠️ 注意：此处键名为空，需确认是否需要有效键名
+        response["viewValue"] = "";
+    }
+    else if (funcCode == 0x205) {
+        response["functionConfig"] = raw;
+        response["viewValue"] = "functionConfig";
+    }
+    else if (funcCode == 0x206) {
+        response["SleepDelay"] = raw;
+        response["viewValue"] = "SleepDelay";
+    }
+    else if (funcCode == 0x207) {
+        response["ShutDownDelay"] = raw;
+        response["viewValue"] = "ShutDownDelay";
+    }
+    else if (funcCode == 0x208) {
+        response["eYa"] = raw;
+        response["viewValue"] = "eYa";
+    }
+    else if (funcCode == 0x20A) {
+        response["mYa"] = raw;
+        response["viewValue"] = "mYa";
+    }
+    else if (funcCode == 0x20C) {
+        response["manYshi"] = raw;
+        response["viewValue"] = "manYshi";
+    }
+    else if (funcCode == 0x210) {
+        response["gbYa"] = raw;
+        response["viewValue"] = "gbYa";
+    }
+    else if (funcCode == 0x211) {
+        response["ghYa"] = raw;
+        response["viewValue"] = "ghYa";
+    }
+    else if (funcCode == 0x212) {
+        response["ovt"] = raw;
+        response["viewValue"] = "ovt";
+    }
+    else if (funcCode == 0x213) {
+        response["VL0V"] = raw;
+        response["viewValue"] = "VL0V";
+    }
+    else if (funcCode == 0x214) {
+        response["VOB"] = raw;
+        response["viewValue"] = "VOB";
+    }
+    else if (funcCode == 0x215) {
+        response["BALD"] = raw;
+        response["viewValue"] = "BALD";
+    }
+    else if (funcCode == 0x216) {
+        response["BALT"] = raw;
+        response["viewValue"] = "BALT";
+    }
+    else if (funcCode == 0x217) {
+        response["ur"] = raw;
+        response["viewValue"] = "ur";
+    }
+    else if (funcCode == 0x218) {
+        response["uvr"] = raw;
+        response["viewValue"] = "uvr";
+    }
+    else if (funcCode == 0x219) {
+        response["UVT"] = raw;
+        response["viewValue"] = "UVT";
+    }
+    else if (funcCode == 0x21A) {
+        response["OCD1"] = raw;
+        response["viewValue"] = "OCD1";
+    }
+    else if (funcCode == 0x21B) {
+        response["OCD1T"] = raw;
+        response["viewValue"] = "OCD1T";
+    }
+    else if (funcCode == 0x21C) {
+        response["OCD2"] = raw;
+        response["viewValue"] = "OCD2";
+    }
+    else if (funcCode == 0x21D) {
+        response["OCD2T"] = raw;
+        response["viewValue"] = "OCD2T";
+    }
+    else if (funcCode == 0x21E) {
+        response["dbYa"] = raw;
+        response["viewValue"] = "dbYa";
+    }
+    else if (funcCode == 0x21F) {
+        response["SCT"] = raw;
+        response["viewValue"] = "SCT";
+    }
+    else if (funcCode == 0x220) {
+        response["OCC"] = raw;
+        response["viewValue"] = "OCC";
+    }
+    else if (funcCode == 0x221) {
+        response["OCCT"] = raw;
+        response["viewValue"] = "OCCT";
+    }
+    else if (funcCode == 0x400) {
+        response["sjCirCount"] = raw;
+        response["viewValue"] = "sjCirCount";
+    }
+    else if (funcCode == 0x401) {
+        response["Cyclecount"] = raw;
+        response["viewValue"] = "Cyclecount";
+    }
+    else if(funcCode == 0x406)
+    {
+        response["zdjg"] = raw;
+        response["viewValue"] = "zdjg";
+    }
+    else if(funcCode == 0x407)
+    {
+        response["zjjg"] = raw;
+        response["viewValue"] = "zjjg";
+    }
     return response;
 }
 
@@ -574,7 +801,7 @@ QVariantMap BMSProtocol::deal_11(const QByteArray &v, int dataLen)
     }
 
     // 组合数据（大端序）
-    quint16 raw = (static_cast<quint8>(v[5]) << 8) | static_cast<quint8>(v[6]);
+    qint16 raw = (static_cast<qint8>(v[5]) << 8) | static_cast<quint8>(v[6]);
     double voltage = raw * 10.0;  // 转换为mA
     response["secondary_current"] = QString::number(voltage / 1000, 'f', 2) + " A";
     return response;

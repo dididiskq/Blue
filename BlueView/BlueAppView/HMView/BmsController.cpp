@@ -321,15 +321,38 @@ void BmsController::viewMessage(const int type)
             v["startAddr"] = 0x001F;
             v["regCount"] = 1;
         }
-        else if(type == 518)
-        {
-            v["startAddr"] = 0x206;
-            v["regCount"] = 1;
-        }
         else if(type >= 32 && type <= 63)//单体电池
         {
             v["startAddr"] = type;
             v["regCount"] = 1;
+        }
+        else
+        {
+            v["startAddr"] = type;
+            if(type == 0x20E || type == 0x402 || type == 0x404)
+            {
+                v["regCount"] = 2;
+            }
+            else if(type == 0x236 || type == 0x246 || type == 0x256)
+            {
+                v["regCount"] = 4;
+            }
+            else if(type == 0x230)
+            {
+                v["regCount"] = 6;
+            }
+            else if(type == 0x23A || type == 0x24A)
+            {
+                v["regCount"] = 12;
+            }
+            else if(type == 0x408)
+            {
+                v["regCount"] = 16;
+            }
+            else
+            {
+                v["regCount"] = 1;
+            }
         }
     }
     array = protocal.byte(v);
@@ -493,7 +516,7 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
     {
         qDebug() << "收到通知数据:" << value.toHex(' ');
         QVariantMap map = protocal.parse(value);
-        qDebug()<<"数据解析内容："<<map;
+        // qDebug()<<"数据解析内容："<<map;
 
         if(map.value("error", -1).toInt() == 1)
         {
@@ -508,7 +531,6 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
 
         quint16 funcCode = map.value("funcCode").toUInt();
 
-        // 处理写响应
         if (map.value("writeOrread").toUInt() == 0x10)// 写响应功能码
         {
             if (m_waitingWriteResponse)
@@ -517,6 +539,7 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
                 m_waitingWriteResponse = false;
                 sendTimer.start(); // 恢复读取队列
                 qDebug()<<"改写成功";
+                return;
                 // 检查响应是否正确
                 if (false)
                 {
@@ -530,6 +553,7 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
                 }
             }
         }
+
 
         if(funcCode == 0x0014)
         {
@@ -648,7 +672,7 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
         {
             selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("functionConfig", map.value("functionConfig"));
         }
-        else if(funcCode >= 0x0020 && funcCode <= 0x003F)
+        else if(funcCode >= 0x0020 && funcCode <= 0x003F) //单体电压
         {
             cellVlist.append(map.value("cellV"));
             if(cellVlist.size() == 32)
@@ -656,6 +680,11 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
                 selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("cellVlist", cellVlist);
                 cellVlist.clear();
             }
+        }
+        else if(funcCode >= 0x200 and funcCode <= 0x221) //可读写数据
+        {
+            QString viewValue = map.value("viewValue").toString();
+            selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue(viewValue, map.value(viewValue));
         }
 
     }

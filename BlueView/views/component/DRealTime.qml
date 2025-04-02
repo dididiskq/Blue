@@ -12,6 +12,7 @@ Page {
         color: "white"
     }
     title: "实时数据"
+
     onCellListChanged:
     {
         if(cellList === undefined)

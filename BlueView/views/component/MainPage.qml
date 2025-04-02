@@ -15,7 +15,6 @@ Item
         source: "../res/76.svg"
     }
 
-
     Component.onCompleted:
     {
         print("首页加载")

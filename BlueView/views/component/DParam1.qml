@@ -195,6 +195,11 @@ Page
                     width: parent.width * 0.8
                     height: parent.height * 0.8
                     text: "设置"
+                    onClicked:
+                    {
+                        var inputDate = cellNumInput.inputObj.text
+                        // srcDict.writeToBlue(512, inputDate)
+                    }
                 }
             }
 
@@ -205,6 +210,6 @@ Page
 
     Component.onCompleted:
     {
-
+        //获取本页面数据
     }
 }

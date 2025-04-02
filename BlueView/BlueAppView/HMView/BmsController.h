@@ -14,6 +14,7 @@
 #include<QTextCodec>
 #include "hmmodule.h"
 #include"HMUtils/protocol/BMSProtocol.h"
+class CHMModule;
 static QString byteArrayToHexStr(const QByteArray &data)
 {
     QString temp = "";

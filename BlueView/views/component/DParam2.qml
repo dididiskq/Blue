@@ -5,7 +5,11 @@ Page
 {
     Component.onCompleted:
     {
-
+        //获取本页面数据
+        srcDict.sendToBlue(-528)
+        srcDict.sendToBlue(-529)
+        srcDict.sendToBlue(-535)
+        srcDict.sendToBlue(-536)
     }
     title: "电压参数"
     // 示例页面：ChargeParamsPage.qml
@@ -13,10 +17,10 @@ Page
     {
         width: parent.width
         paramList: [
-            { name: "过充保护电压", value: 3650, unit: "mV" },
-            { name: "过充回复电压", value: 3350, unit: "mV" },
-            { name: "过放保护电压",  value: 2300, unit: "mV" },
-            { name: "过放恢复电压",  value: 2440, unit: "mV" },
+            { name: "过充保护电压", value: 3650, unit: "mV" , cellData: 528},
+            { name: "过充回复电压", value: 3350, unit: "mV" , cellData: 529},
+            { name: "过放保护电压",  value: 2300, unit: "mV", cellData: 535},
+            { name: "过放恢复电压",  value: 2440, unit: "mV", cellData: 536},
         ]
     }
 }
