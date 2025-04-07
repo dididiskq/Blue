@@ -87,8 +87,10 @@ public:
     QVariantMap deal_1F(const QByteArray& v, int dataLen); //功能开关配置寄存器
     QVariantMap deal_206(const QByteArray& v, int dataLen);
     QVariantMap paseCellVs(quint16 cmd, const QByteArray &data);
-    QVariantMap paseString(const QByteArray& v, int dataLen);
-    QVariantMap paseUn16And1(const QByteArray& v, int dataLen);
+    QVariantMap paseString(const QByteArray& buf, int dataLen);
+    QVariantMap paseUn16And1(const QByteArray& buf, int dataLen);
+    QVariantMap paseInt16And1(const QByteArray& buf, int dataLen);
+    QVariantMap paseUint32And2(const QByteArray& buf, int dataLen);
     //写命令回调函数
     QVariantMap procCommand(int dataLen, quint16 cmd, const QByteArray &data);
 

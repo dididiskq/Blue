@@ -58,7 +58,9 @@ QtObject
     property var functionConfig: fields["functionConfig"] //功能开关配置寄存器
     property var cellVlist: fields["cellVlist"] //功能开关配置寄存器
 
-
+    property var vob: fields["VOB"]
+    property var bald: fields["BALD"]
+    property var balt: fields["BALT"]
     property var ov: fields["OV"]
     property var ovr: fields["OVR"]
     property var uv: fields["UV"]
@@ -66,12 +68,12 @@ QtObject
     property var uvt: fields["UVT"]
     property var ocd1: fields["OCD1"]
     property var ocd2: fields["OCD2"]
+    property var ocd1t: fields["OCD1T"]
     property var ocd2t: fields["OCD2T"]
-    property var ocd2t: fields["tes"] // 短路保护电流
+    property var dbYa: fields["dbYa"]
     property var sct: fields["SCT"]
     property var occ: fields["OCC"]
     property var occt: fields["OCCT"]
-    property var sleepDelay: fields["SleepDelay"]
     property var shutDownDelay: fields["ShutDownDelay"]
     property var eYa: fields["eYa"]
     property var eLiu: fields["eLiu"]
@@ -79,10 +81,28 @@ QtObject
     property var mLiu: fields["mLiu"]
     property var mYan: fields["mYan"]
     property var sleepDelay: fields["SleepDelay"]
-    property var SampleRValue: fields["SampleRValue"]
+    property var sampleRValue: fields["SampleRValue"]
+    property var lingYuzhi: fields["lingYuzhi"]
 
 
+    property var otc: fields["OTC"]
+    property var otcr: fields["OTCR"]
+    property var utc: fields["UTC"]
+    property var utcr: fields["UTCR"]
+    property var otd: fields["OTD"]
+    property var otdr: fields["OTDR"]
+    property var utd: fields["UTD"]
+    property var utdr: fields["UTDR"]
+    property var motd: fields["MOTD"]
+    property var motdr: fields["MOTDR"]
 
+    property var bt: fields["bt"]
+    property var mnfDate: fields["mnfDate"]
+    property var customerMode: fields["customerMode"]
+    property var customerName: fields["customerName"]
+    property var manufacturerMode: fields["manufacturerMode"]
+    property var manufacturer: fields["manufacturer"]
+    property var sn: fields["sn"]
 
     // 动态缩放函数
     function scaled(value)

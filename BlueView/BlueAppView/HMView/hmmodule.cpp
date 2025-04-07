@@ -12,8 +12,7 @@ CHMModule::CHMModule(QObject *parent)
     version = "1.00.001.20250224";
     HMUtils::log() << QString("界面程序版本： %1").arg(version) <<HMLog::endl;
 
-    selfMqttCommand = new CHMMqttCommand(this, "HMMain");  // 通讯对象
-    selfRegister.setRegister(selfIni.selfRevNames, selfMqttCommand);
+
 
     selfViewCommand = new CHMViewCommand(this, "hmView");  // 界面对象
     selfRegister.setRegister(selfIni.selfModuelName, selfViewCommand);
@@ -24,11 +23,7 @@ CHMModule::CHMModule(QObject *parent)
 
 CHMModule::~CHMModule()
 {
-    if (selfMqttCommand)
-    {
-        delete selfMqttCommand;
-        selfMqttCommand = NULL;
-    }
+
     if (selfViewCommand)
     {
         delete selfViewCommand;

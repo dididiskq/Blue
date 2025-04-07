@@ -19,14 +19,14 @@ Page
     {
         width: parent.width
         paramList: [
-            { name: "额定充电电压", value: 66, unit: "0.1V", cellData:520 },
-            { name: "额定充电电流", value: 66, unit: "0.1A", cellData:521 },
-            { name: "休眠延时",  value: -66, unit: "s", cellData:518 },
-            { name: "关机延时",  value: -66, unit: "s", cellData:519 },
-            { name: "满充延时", value: 66, unit: "s", cellData:524 },
-            { name: "满充电压", value: 66, unit: "mV", cellData:522 },
-            { name: "满充电流",  value: -66, unit: "mA", cellData:523 },
-            { name: "零电流显示阈值",  value: -66, unit: "mA", cellData:525 },
+            { name: "额定充电电压", value: srcDict.eYa === undefined ? 0 : srcDict.eYa, unit: "0.1V", cellData:520 },
+            { name: "额定充电电流", value: srcDict.eLiu === undefined ? 0 : srcDict.eLiu, unit: "0.1A", cellData:521 },
+            { name: "休眠延时",  value: srcDict.sleepDelay === undefined ? 0 : srcDict.sleepDelay, unit: "s", cellData:518 },
+            { name: "关机延时",  value: srcDict.shutDownDelay === undefined ? 0 : srcDict.shutDownDelay, unit: "s", cellData:519 },
+            { name: "满充延时", value: srcDict.mYan === undefined ? 0 : srcDict.mYan, unit: "s", cellData:524 },
+            { name: "满充电压", value: srcDict.mYa === undefined ? 0 : srcDict.mYa, unit: "mV", cellData:522 },
+            { name: "满充电流",  value: srcDict.mLiu === undefined ? 0 : srcDict.mLiu, unit: "mA", cellData:523 },
+            { name: "零电流显示阈值",  value: srcDict.lingYuzhi === undefined ? 0 : srcDict.lingYuzhi, unit: "mA", cellData:525 },
         ]
     }
 }

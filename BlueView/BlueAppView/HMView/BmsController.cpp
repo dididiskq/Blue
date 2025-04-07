@@ -140,6 +140,7 @@ void BmsController::viewWriteMessage(const QVariantMap &op)
 {
     if(isConnected == false)
     {
+        qDebug()<<"蓝牙未连接";
         return;
     }
     QByteArray array;
@@ -171,6 +172,7 @@ void BmsController::viewMessage(const int type)
 {
     if(isConnected == false)
     {
+        qDebug()<<"蓝牙未连接";
         return;
     }
     //调用协议

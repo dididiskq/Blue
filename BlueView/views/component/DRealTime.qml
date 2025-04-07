@@ -55,9 +55,9 @@ Page {
             {
             }
 
-            InfoGridLang
-            {
-            }
+            // InfoGridLang
+            // {
+            // }
 
             // 电池信息
             InfoGrid

@@ -142,13 +142,6 @@ bool CHMView::initViews()
         Q_ASSERT(v != NULL);
         Q_ASSERT(c != NULL);
 
-        // 注册自定义图像提供者到 QML 引擎0227
-//        QQmlEngine *engine = v->engine();
-//        if (engine) {
-//            // 添加提供者，providerId 为 "qrcode"
-//            engine->addImageProvider("qrcode", new QRCodeImageProvider());
-//        }
-
         connect(c, SIGNAL(viewInvoke(QString,QVariant,QVariant&)), SLOT(onViewInvoke(QString,QVariant,QVariant&)));
         v->setResizeMode(QQuickView::SizeRootObjectToView);
         v->rootContext()->setContextProperty(name+"Context", c);

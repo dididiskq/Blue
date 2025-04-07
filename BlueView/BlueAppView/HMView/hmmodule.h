@@ -3,7 +3,7 @@
 #include <QObject>
 // #include "HMUtils/device/hmmqttclient.h"
 #include "hmmoduleini.h"
-#include "hmmqttcommand.h"
+
 #include "hmviewcommand.h"
 #include "QVariantMap"
 #include "HMUtils/common/hmregister.h"
@@ -12,7 +12,7 @@
 // #include "HMUtils/network/hmudp.h"
 // #include <QMediaPlayer>
 #include<QProcess>
-class CHMMqttCommand;
+
 class CHMViewCommand;
 class BmsController;
 // The CHMModule class
@@ -34,7 +34,7 @@ public slots:
 
 public:
     CHMModuleIni selfIni;               // 配置文件
-    CHMMqttCommand *selfMqttCommand;    // 通讯助手
+
     CHMViewCommand *selfViewCommand;    // 界面文件
     BmsController *selfBmsCommand;
     CHMRegister selfRegister;           // 注册器

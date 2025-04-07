@@ -38,14 +38,14 @@ BMSProtocol::BMSProtocol(QObject *parent) : QObject(parent)
     commands[0x001E] = [this](const QByteArray& data, int dataLen) { return deal_1E(data, dataLen); };
     commands[0x001F] = [this](const QByteArray& data, int dataLen) { return deal_1F(data, dataLen); };
     commands[0x206] = [this](const QByteArray& data, int dataLen) { return deal_206(data, dataLen); };
-
+    //paseString
     commands[0x230] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     commands[0x236] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     commands[0x23A] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     commands[0x246] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     commands[0x256] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     commands[0x408] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
-
+    //paseUn16And1
     commands[0x200] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x201] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x202] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
@@ -74,6 +74,23 @@ BMSProtocol::BMSProtocol(QObject *parent) : QObject(parent)
     commands[0x21E] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x21F] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x221] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    //paseInt16And1
+    commands[0x209] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x20B] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x20D] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x222] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x223] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x224] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x225] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x226] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x227] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x228] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x229] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x22A] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    commands[0x22B] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
+    // /paseUint32And2
+    commands[0x402] = [this](const QByteArray& data, int dataLen) { return paseUint32And2(data, dataLen); };
+    commands[0x404] = [this](const QByteArray& data, int dataLen) { return paseUint32And2(data, dataLen); };
 
 
     //写组装函数
@@ -232,6 +249,10 @@ QVariantMap BMSProtocol::procCommand(int dataLen, quint16 cmd, const QByteArray 
     {
         return paseCellVs(cmd, data);
     }
+    if(cmd >= 0x418)
+    {
+        return paseUint32And2(data, dataLen);
+    }
     return {{"error", 2}};
 }
 
@@ -287,6 +308,21 @@ QByteArray BMSProtocol::byte_string(const QVariantMap &data)
 QByteArray BMSProtocol::byte_int16and1(const QVariantMap &data)
 {
     QByteArray array;
+    quint16 regCount = 1;//变值
+    array.append(static_cast<char>((regCount >> 8) & 0xFF));
+    array.append(static_cast<char>(regCount & 0xFF));
+
+    int userInput = data.value("inputData", -1).toInt();
+
+    // 转换为16位整数并处理字节序
+    qint16 batteryCount = static_cast<qint16>(userInput);
+    qint16 networkOrder = qToBigEndian(batteryCount); // 大端序转换
+
+    // 构造数据段
+    QByteArray data_(reinterpret_cast<const char*>(&networkOrder), sizeof(networkOrder));
+
+    array.append(static_cast<char>(data_.size()));
+    array.append(data_);
     return array;
 }
 
@@ -491,6 +527,129 @@ QVariantMap BMSProtocol::paseUn16And1(const QByteArray &buf, int dataLen)
     {
         response["zjjg"] = raw;
         response["viewValue"] = "zjjg";
+    }
+    return response;
+}
+
+QVariantMap BMSProtocol::paseInt16And1(const QByteArray &buf, int dataLen)
+{
+    QVariantMap response;
+    quint16 funcCodeH = static_cast<quint8>(buf.at(2));
+    quint16 funcCodeL = static_cast<quint8>(buf.at(3));
+    quint16 funcCode = (static_cast<quint16>(funcCodeH) << 8) | funcCodeL;
+    qint16 raw_ = (static_cast<qint8>(buf[5]) << 8) | static_cast<qint8>(buf[6]);
+    QString raw = QString::number(static_cast<int>(raw_));
+    if (funcCode == 0x222)
+    {
+        response["OTC"] = raw;
+        response["viewValue"] = "OTC";
+    }
+    else if(funcCode == 0x223)
+    {
+        response["OTCR"] = raw;
+        response["viewValue"] = "OTCR";
+    }
+    else if(funcCode == 0x224)
+    {
+        response["UTC"] = raw;
+        response["viewValue"] = "UTC";
+    }
+    else if(funcCode == 0x225)
+    {
+        response["UTCR"] = raw;
+        response["viewValue"] = "UTCR";
+    }
+    else if(funcCode == 0x226)
+    {
+        response["OTD"] = raw;
+        response["viewValue"] = "OTD";
+    }
+    else if(funcCode == 0x227)
+    {
+        response["OTDR"] = raw;
+        response["viewValue"] = "OTDR";
+    }
+    else if(funcCode == 0x228)
+    {
+        response["UTD"] = raw;
+        response["viewValue"] = "UTD";
+    }
+    else if(funcCode == 0x229)
+    {
+        response["UTDR"] = raw;
+        response["viewValue"] = "UTDR";
+    }
+    else if(funcCode == 0x22A)
+    {
+        response["MOTD"] = raw;
+        response["viewValue"] = "MOTD";
+    }
+    else if(funcCode == 0x22B)
+    {
+        response["MOTDR"] = raw;
+        response["viewValue"] = "MOTDR";
+    }
+    else if(funcCode == 0x209)
+    {
+        response["eChongLiu"] = raw;
+        response["viewValue"] = "eChongLiu";
+    }
+    else if(funcCode == 0x20B)
+    {
+        response["mChongLiu"] = raw;
+        response["viewValue"] = "mChongLiu";
+    }
+    else if(funcCode == 0x20D)
+    {
+        response["lingYuzhi"] = raw;
+        response["viewValue"] = "lingYuzhi";
+    }
+    return response;
+}
+
+QVariantMap BMSProtocol::paseUint32And2(const QByteArray &buf, int dataLen)
+{
+
+    QVariantMap response;
+    quint16 funcCodeH = static_cast<quint8>(buf.at(2));
+    quint16 funcCodeL = static_cast<quint8>(buf.at(3));
+    quint16 funcCode = (static_cast<quint16>(funcCodeH) << 8) | funcCodeL;
+    // 将4字节数据转换为uint32（大端序）
+    quint32 a = (static_cast<quint32>(static_cast<quint8>(buf[5])) << 24) |
+                (static_cast<quint32>(static_cast<quint8>(buf[6])) << 16) |
+                (static_cast<quint32>(static_cast<quint8>(buf[7])) << 8) |
+                static_cast<quint32>(static_cast<quint8>(buf[8]));
+
+    // 提取时间字段
+    int year = ((a & 0xFC000000) >> 26) + 2000;  // 年 = 高6位 + 2000
+    int month = (a & 0x03C00000) >> 22;          // 月 = 4位
+    int day = (a & 0x003E0000) >> 17;            // 日 = 5位
+    int hour = (a & 0x0001F000) >> 12;           // 时 = 5位
+    int minute = (a & 0x00000FC0) >> 6;          // 分 = 6位
+    int second = (a & 0x0000003F) >> 0;          // 秒 = 6位
+
+    // 格式化为字符串
+    QString timeStr = QString("%1-%2-%3 %4:%5:%6")
+                          .arg(year, 4)  // 4位年份
+                          .arg(month, 2, 10, QLatin1Char('0'))  // 2位月，补零
+                          .arg(day, 2, 10, QLatin1Char('0'))     // 2位日，补零
+                          .arg(hour, 2, 10, QLatin1Char('0'))    // 2位时，补零
+                          .arg(minute, 2, 10, QLatin1Char('0'))  // 2位分，补零
+                          .arg(second, 2, 10, QLatin1Char('0')); // 2位秒，补零
+    if (funcCode >= 0x418)
+    {
+        response["protectTime"] = timeStr;
+        response["viewValue"] = "protectTime";
+    }
+    else if(funcCode == 0x402)
+    {
+        response["FCC"] = timeStr;
+        response["viewValue"] = "FCC";
+    }
+    else if(funcCode == 0x404)
+    {
+        response["DC"] = timeStr;
+        response["viewValue"] = "DC";
     }
     return response;
 }
