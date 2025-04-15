@@ -5,7 +5,7 @@ import QtQuick.Layouts
 Page
 {
     id: minePage
-
+    property int currIndex: -1
 
     header:ToolBar
     {
@@ -44,6 +44,36 @@ Page
         id: stackViewMine
         anchors.fill: parent
         initialItem: mainMenu
+    }
+    PasswordDialog
+    {
+        id: passwordDialog
+        x: 50
+        y: 200
+        title: "安全验证"
+        message: "请输入管理员密码"
+        onConfirmed: (pwd) =>
+        {
+            console.log("输入密码:", pwd)
+            if(pwd)
+            {
+                if(currIndex === 3)
+                             {
+                                 stackViewMine.push("BmsControl.qml")
+                             }
+                             else if(currIndex === 2)
+                             {
+                                 stackViewMine.push("OperaBoard.qml")
+                             }
+
+                passwordDialog.close()
+            }
+            else
+            {
+                passwordDialog.message = "密码错误请重新输入"
+            }
+        }
+        onCanceled: console.log("操作取消")
     }
     Page
     {
@@ -134,7 +164,9 @@ Page
                     anchors.fill: parent
                     onClicked:
                     {
-                        stackViewMine.push("OperaBoard.qml")
+                        currIndex = 2
+                        passwordDialog.open()
+
                     }
                 }
 
@@ -164,7 +196,10 @@ Page
                     anchors.fill: parent
                     onClicked:
                     {
+                        // currIndex = 2
                         stackViewMine.push("BmsControl.qml")
+                        // passwordDialog.open()
+
                     }
                 }
 

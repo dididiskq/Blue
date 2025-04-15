@@ -8,7 +8,8 @@
 #include<QMap>
 #include <QString>
 #include <QVariantMap>
-
+#include <QDataStream>
+#include <QIODevice>
 static const unsigned short crc16tab[256] = {
     0x0000,0x1021,0x2042,0x3063,0x4084,0x50a5,0x60c6,0x70e7,
     0x8108,0x9129,0xa14a,0xb16b,0xc18c,0xd1ad,0xe1ce,0xf1ef,
@@ -91,6 +92,7 @@ public:
     QVariantMap paseUn16And1(const QByteArray& buf, int dataLen);
     QVariantMap paseInt16And1(const QByteArray& buf, int dataLen);
     QVariantMap paseUint32And2(const QByteArray& buf, int dataLen);
+    QVariantMap paseFloatAnd2(const QByteArray& buf, int dataLen);
     //写命令回调函数
     QVariantMap procCommand(int dataLen, quint16 cmd, const QByteArray &data);
 
@@ -100,6 +102,8 @@ public:
     QByteArray byte_string(const QVariantMap& data);
     QByteArray byte_int16and1(const QVariantMap& data);
     QByteArray byte_uint32and2(const QVariantMap& data);
+    QByteArray byte_floatand2(const QVariantMap& data);
+
 
 
 private:

@@ -45,6 +45,7 @@ BMSProtocol::BMSProtocol(QObject *parent) : QObject(parent)
     commands[0x246] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     commands[0x256] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     commands[0x408] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
+    commands[0x24A] = [this](const QByteArray& data, int dataLen) { return paseString(data, dataLen); };
     //paseUn16And1
     commands[0x200] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x201] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
@@ -73,7 +74,9 @@ BMSProtocol::BMSProtocol(QObject *parent) : QObject(parent)
     commands[0x21D] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x21E] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x21F] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x220] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     commands[0x221] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
+    commands[0x400] = [this](const QByteArray& data, int dataLen) { return paseUn16And1(data, dataLen); };
     //paseInt16And1
     commands[0x209] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
     commands[0x20B] = [this](const QByteArray& data, int dataLen) { return paseInt16And1(data, dataLen); };
@@ -91,6 +94,8 @@ BMSProtocol::BMSProtocol(QObject *parent) : QObject(parent)
     // /paseUint32And2
     commands[0x402] = [this](const QByteArray& data, int dataLen) { return paseUint32And2(data, dataLen); };
     commands[0x404] = [this](const QByteArray& data, int dataLen) { return paseUint32And2(data, dataLen); };
+    //paseFloatAnd2
+    commands[0x20E] = [this](const QByteArray& data, int dataLen) { return paseFloatAnd2(data, dataLen); };
 
 
     //写组装函数
@@ -145,6 +150,8 @@ BMSProtocol::BMSProtocol(QObject *parent) : QObject(parent)
     //uint32,寄存器为2
     writeByteCommands[0x402] = [this](const QVariantMap& data) { return byte_uint32and2(data); };
     writeByteCommands[0x404] = [this](const QVariantMap& data) { return byte_uint32and2(data); };
+    //float 2
+    writeByteCommands[0x20E] = [this](const QVariantMap& data) { return byte_floatand2(data); };
 }
 //封装报文
 QByteArray BMSProtocol::byte(const QVariant &v)
@@ -329,15 +336,64 @@ QByteArray BMSProtocol::byte_int16and1(const QVariantMap &data)
 QByteArray BMSProtocol::byte_uint32and2(const QVariantMap &data)
 {
     QByteArray array;
+    quint16 regCount = 2;
+    array.append(static_cast<char>((regCount >> 8) & 0xFF));
+    array.append(static_cast<char>(regCount & 0xFF));
+
+    // 从输入获取用户数据并转换为 quint32
+    bool ok;
+    quint32 userInput = data.value("inputData", 0).toUInt(&ok);
+    if (!ok) {
+        qWarning() << "Invalid uint32 input";
+        return {};
+    }
+
+    // 转换为大端序字节流
+    quint32 beValue = qToBigEndian(userInput);
+    QByteArray data_(reinterpret_cast<const char*>(&beValue), sizeof(beValue));
+
+    // 添加数据长度和数据内容
+    array.append(static_cast<char>(data_.size())); // 数据长度固定为4字节
+    array.append(data_);
     return array;
 }
+QByteArray BMSProtocol::byte_floatand2(const QVariantMap &data)
+{
+    QByteArray array;
+    quint16 regCount = 2;
+    array.append(static_cast<char>((regCount >> 8) & 0xFF));
+    array.append(static_cast<char>(regCount & 0xFF));
+
+    // 从输入获取用户数据并转换为 float
+    bool ok;
+    float userInput = data.value("inputData", 0.0f).toFloat(&ok);
+    if (!ok) {
+        qWarning() << "Invalid float input";
+        return {};
+    }
+
+    // 转换为大端序字节流（使用 QDataStream 确保跨平台兼容性）
+    QByteArray data_;
+    QDataStream stream(&data_, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);  // 强制大端序
+    stream << userInput;  // 写入浮点数
+
+    // 添加数据长度和数据内容
+    array.append(static_cast<char>(data_.size())); // 数据长度固定为4字节
+    array.append(data_);
+    return array;
+}
+
+
 QVariantMap BMSProtocol::paseCellVs(quint16 cmd, const QByteArray &data)
 {
     QVariantMap response;
     // 组合数据（大端序）
     quint16 raw = (static_cast<quint8>(data[5]) << 8) | static_cast<quint8>(data[6]);
-    double value = raw * 10.0;  // 转换为mV
-    response["cellV"] = QString::number(value / 1000, 'f', 2) + " V";
+    double value = raw * 0.0010;
+    value = std::round(value * 100.0) / 100.0;
+    // response["cellV"] = QString::number(value / 1000, 'f', 2) + " V";
+    response["cellV"] = value;
     return response;
 }
 
@@ -348,40 +404,56 @@ QVariantMap BMSProtocol::paseString(const QByteArray& buf, int dataLen)
     quint16 funcCodeL = static_cast<quint8>(buf.at(3));
     quint16 funcCode = (static_cast<quint16>(funcCodeH) << 8) | funcCodeL;
     QString value;
+    // 检查数据长度是否合法
+    int dataLength = static_cast<quint8>(buf.at(4));
+    if (buf.size() < 5 + dataLength)
+    {
+        response["error"] = "Data length exceeds buffer";
+        return response;
+    }
+
+
     for(int i = 5; i < buf.at(4) + 5; i++)
     {
         quint8 byte = static_cast<quint8>(buf.at(i));
-
-        value.append(QString("%1").arg(byte, 2, 16, QLatin1Char('0')).toUpper());
+        value.append(QChar(byte)); // 转为ASCII字符
     }
     if(funcCode == 0x230)//SN
     {
         response["sn"] = value;
+        response["viewValue"] = "sn";
     }
     else if(funcCode == 0x236)//Manufacturer
     {
         response["manufacturer"] = value;
+        response["viewValue"] = "manufacturer";
     }
     else if(funcCode == 0x23A)//ManufacturerMode
     {
         response["manufacturerMode"] = value;
+        response["viewValue"] = "manufacturerMode";
     }
     else if(funcCode == 0x246)//CustomerName
     {
         response["customerName"] = value;
+        response["viewValue"] = "customerName";
     }
     else if(funcCode == 0x24A)//CustomerMode
     {
         response["customerMode"] = value;
+        response["viewValue"] = "customerMode";
     }
     else if(funcCode == 0x256)//MNFDate
     {
         response["mnfDate"] = value;
+        response["viewValue"] = "mnfDate";
     }
     else if(funcCode == 0x408)//BT
     {
         response["bt"] = value;
+        response["viewValue"] = "bt";
     }
+    qDebug()<<response;
     return response;
 }
 
@@ -395,8 +467,8 @@ QVariantMap BMSProtocol::paseUn16And1(const QByteArray &buf, int dataLen)
     QString raw = QString::number(static_cast<int>(raw_));
 
     if (funcCode == 0x200) {
-        response["cellNumber"] = raw;
-        response["viewValue"] = "cellNumber";
+        response["cellNum"] = raw;
+        response["viewValue"] = "cellNum";
     }
     else if (funcCode == 0x201) {
         response["cellType"] = raw;
@@ -439,12 +511,12 @@ QVariantMap BMSProtocol::paseUn16And1(const QByteArray &buf, int dataLen)
         response["viewValue"] = "manYshi";
     }
     else if (funcCode == 0x210) {
-        response["gbYa"] = raw;
-        response["viewValue"] = "gbYa";
+        response["OV"] = raw;
+        response["viewValue"] = "OV";
     }
     else if (funcCode == 0x211) {
-        response["ghYa"] = raw;
-        response["viewValue"] = "ghYa";
+        response["OVR"] = raw;
+        response["viewValue"] = "OVR";
     }
     else if (funcCode == 0x212) {
         response["ovt"] = raw;
@@ -467,12 +539,12 @@ QVariantMap BMSProtocol::paseUn16And1(const QByteArray &buf, int dataLen)
         response["viewValue"] = "BALT";
     }
     else if (funcCode == 0x217) {
-        response["ur"] = raw;
-        response["viewValue"] = "ur";
+        response["UV"] = raw;
+        response["viewValue"] = "UV";
     }
     else if (funcCode == 0x218) {
-        response["uvr"] = raw;
-        response["viewValue"] = "uvr";
+        response["UVR"] = raw;
+        response["viewValue"] = "UVR";
     }
     else if (funcCode == 0x219) {
         response["UVT"] = raw;
@@ -528,6 +600,7 @@ QVariantMap BMSProtocol::paseUn16And1(const QByteArray &buf, int dataLen)
         response["zjjg"] = raw;
         response["viewValue"] = "zjjg";
     }
+    // qDebug()<<response;
     return response;
 }
 
@@ -536,9 +609,9 @@ QVariantMap BMSProtocol::paseInt16And1(const QByteArray &buf, int dataLen)
     QVariantMap response;
     quint16 funcCodeH = static_cast<quint8>(buf.at(2));
     quint16 funcCodeL = static_cast<quint8>(buf.at(3));
-    quint16 funcCode = (static_cast<quint16>(funcCodeH) << 8) | funcCodeL;
-    qint16 raw_ = (static_cast<qint8>(buf[5]) << 8) | static_cast<qint8>(buf[6]);
-    QString raw = QString::number(static_cast<int>(raw_));
+    quint16 funcCode = (static_cast<quint16>(funcCodeH << 8) | funcCodeL);
+    qint16 raw_ = (static_cast<quint8>(buf[5]) << 8) | static_cast<quint8>(buf[6]);
+    QString raw = QString::number(static_cast<qint16>(raw_));
     if (funcCode == 0x222)
     {
         response["OTC"] = raw;
@@ -591,19 +664,20 @@ QVariantMap BMSProtocol::paseInt16And1(const QByteArray &buf, int dataLen)
     }
     else if(funcCode == 0x209)
     {
-        response["eChongLiu"] = raw;
-        response["viewValue"] = "eChongLiu";
+        response["eLiu"] = raw;
+        response["viewValue"] = "eLiu";
     }
     else if(funcCode == 0x20B)
     {
-        response["mChongLiu"] = raw;
-        response["viewValue"] = "mChongLiu";
+        response["mcLiu"] = raw;
+        response["viewValue"] = "mcLiu";
     }
     else if(funcCode == 0x20D)
     {
         response["lingYuzhi"] = raw;
         response["viewValue"] = "lingYuzhi";
     }
+
     return response;
 }
 
@@ -621,7 +695,7 @@ QVariantMap BMSProtocol::paseUint32And2(const QByteArray &buf, int dataLen)
                 static_cast<quint32>(static_cast<quint8>(buf[8]));
 
     // 提取时间字段
-    int year = ((a & 0xFC000000) >> 26) + 2000;  // 年 = 高6位 + 2000
+    int year = ((a & 0xFC000000) >> 26) + 2022;  // 年 = 高6位 + 2000
     int month = (a & 0x03C00000) >> 22;          // 月 = 4位
     int day = (a & 0x003E0000) >> 17;            // 日 = 5位
     int hour = (a & 0x0001F000) >> 12;           // 时 = 5位
@@ -636,10 +710,16 @@ QVariantMap BMSProtocol::paseUint32And2(const QByteArray &buf, int dataLen)
                           .arg(hour, 2, 10, QLatin1Char('0'))    // 2位时，补零
                           .arg(minute, 2, 10, QLatin1Char('0'))  // 2位分，补零
                           .arg(second, 2, 10, QLatin1Char('0')); // 2位秒，补零
-    if (funcCode >= 0x418)
+    if (funcCode >= 0x418 && funcCode <= 0x446)
     {
         response["protectTime"] = timeStr;
         response["viewValue"] = "protectTime";
+    }
+    else if(funcCode >= 0x448 && funcCode <= 0x476)
+    {
+        QString hexString = QString("0x%1").arg(a, 8, 16, QChar('0')).toUpper();
+        response["protectEvent"] = hexString;
+        response["viewValue"] = "protectEvent";
     }
     else if(funcCode == 0x402)
     {
@@ -650,6 +730,34 @@ QVariantMap BMSProtocol::paseUint32And2(const QByteArray &buf, int dataLen)
     {
         response["DC"] = timeStr;
         response["viewValue"] = "DC";
+    }
+    return response;
+}
+
+QVariantMap BMSProtocol::paseFloatAnd2(const QByteArray &buf, int dataLen)
+{
+    QVariantMap response;
+    quint16 funcCodeH = static_cast<quint8>(buf.at(2));
+    quint16 funcCodeL = static_cast<quint8>(buf.at(3));
+    quint16 funcCode = (static_cast<quint16>(funcCodeH) << 8) | funcCodeL;
+
+    quint8 b0 = static_cast<quint8>(buf.at(5));  // 高字节
+    quint8 b1 = static_cast<quint8>(buf.at(6));
+    quint8 b2 = static_cast<quint8>(buf.at(7));
+    quint8 b3 = static_cast<quint8>(buf.at(8));  // 低字节
+    // 组合为 32 位整数（大端序）
+    quint32 rawValue = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
+
+    // 转换为 float
+    float floatValue;
+    memcpy(&floatValue, &rawValue, sizeof(float));  // 安全转换
+
+    // 保留3位小数
+    QString formattedValue = QString::number(static_cast<double>(floatValue), 'f', 3);
+    if (funcCode == 0x20E)
+    {
+        response["SampleRValue"] = formattedValue;
+        response["viewValue"] = "SampleRValue";
     }
     return response;
 }
@@ -864,37 +972,45 @@ QVariantMap BMSProtocol::deal_0E(const QByteArray &v, int dataLen)
     // alarm["温度采集断线报警"] = (status & 0x0010) ? "触发" : "正常";
     // alarm["AFE通讯失效报警"] = (status & 0x0020) ? "触发" : "正常";
     // alarm["电池组压差大报警"] = (status & 0x0040) ? "触发" : "正常";
-    QString res = "正常";
+    QString res = "normal";
+    int alarmCount = 0;
     if(status & 0x0001)
     {
         res = "超高压报警";
+        alarmCount++;
     }
     if(status & 0x0002)
     {
         res = "超低压报警";
+        alarmCount++;
     }
     if(status & 0x0004)
     {
         res = "防拆卸报警";
+        alarmCount++;
     }
     if(status & 0x0008)
     {
         res = "电压采集断线报警";
+        alarmCount++;
     }
     if(status & 0x0010)
     {
         res = "温度采集断线报警";
+        alarmCount++;
     }
     if(status & 0x0020)
     {
         res = "AFE通讯失效报警";
+        alarmCount++;
     }
     if(status & 0x0040)
     {
         res = "电池组压差大报警";
+        alarmCount++;
     }
 
-    response["alarm_status"] = res;
+    response["alarm_status"] = alarmCount;
     return response;
 }
 
@@ -1054,7 +1170,7 @@ QVariantMap BMSProtocol::deal_18(const QByteArray &v, int dataLen)
         return response;
     }
     // 组合数据（大端序）
-    quint8 cellNum = static_cast<quint8>(v[5] >> 8);
+    quint8 cellNum = static_cast<quint8>(v[5]);
     quint8 celllType = static_cast<quint8>(v[6]);
     response["celllType"] = celllType;
     response["cellNum"] = cellNum;

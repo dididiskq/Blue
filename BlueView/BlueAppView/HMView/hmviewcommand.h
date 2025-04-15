@@ -5,13 +5,10 @@
 #include <QTranslator>
 #include <chmres.h>
 #include "hmview.h"
-#include "hmmoduleini.h"
 #include "hmmodule.h"
 #include "HMUtils/common/hmcommand.h"
 #include <QZXing.h>
-//#include "opencv2/opencv.hpp"
-// #include <QSoundEffect>
-// #include <QtConcurrent>
+
 class CHMModule;
 class CHMViewCommand: public CHMCommand
 {
@@ -41,6 +38,7 @@ public:
     bool onSendToBlue(const QVariantMap &op);
     bool onSendCodeData(const QVariantMap &op);
     bool onConnectBlue(const QVariantMap &op);
+    bool onGetProtectMsg(const QVariantMap &op);
 
     void playAudio(const QString &filePath);
 public:
@@ -59,6 +57,7 @@ signals:
     void sendBlueSlot(const int type);
     void connectBlueSlot(const QString addr);
     void writeBlueSlot(const QVariantMap &op);
+    void protectMsgSignal();
 public:
     CHMModule *selfObj;
     CHMView selfView;                                             // 界面对象
@@ -67,12 +66,9 @@ public:
     bool imageReady = false;
 
     int currentIndex;
-//    QImage m_currentFrame;    // 存储当前帧
-//    cv::VideoCapture m_camera; // OpenCV 摄像头对象
-//    QTimer m_updateTimer;      // 定时器，用于定期捕获帧
-//    bool isSendCamera = true;
+
     int frameCount = 0;
-    // QSoundEffect effect;  // 将 QSoundEffect 作为成员变量
+
 
 
 };

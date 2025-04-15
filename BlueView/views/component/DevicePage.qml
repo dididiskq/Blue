@@ -12,6 +12,7 @@ Page
     }
     header:ToolBar
     {
+        id: headTool
         height: srcDict.scaled(80)
         background: Rectangle
         {
@@ -71,7 +72,8 @@ Page
     {
         id: drawer
         width: window.width * 0.7
-        height: window.height
+        height: window.height * 0.8
+        y: headTool.height
         dim: false // 关闭默认的暗色遮罩
         edge: Qt.LeftEdge
         // 添加半透明背景

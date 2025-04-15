@@ -126,9 +126,10 @@ public slots:
 
     void BleServiceCharacteristicRead(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void sendMsgByQueue();
+    void getProtectMsgSlot();
 private:
 
-
+    void processNextWriteRequest();
 
 private:
     CHMModule *selfObj;
@@ -155,6 +156,9 @@ private:
     QQueue<QByteArray> commandQueue;
     QTimer sendTimer;
 
+    QQueue<QByteArray> writeQueue;  // 写入请求队列
+    bool isWriting = false;         // 当前是否正在写入
+
     const QBluetoothUuid SERVICE_UUID = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E1001"));
     const QBluetoothUuid WRITE_UUID   = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E0001"));
     const QBluetoothUuid NOTIFY_UUID  = QBluetoothUuid(QUuid("00002760-08C2-11E1-9073-0E8AC72E0002"));
@@ -164,6 +168,7 @@ private:
 
     bool isConnected = false;
     QVariantList cellVlist;
+    QVariantMap protectMap;//保护事件、时间
     QList<int> initCmdList{0, 1, 2,3,4,6,
                             8, 10, 12,14 ,15,16,
                             17,18,19,20,21,22,

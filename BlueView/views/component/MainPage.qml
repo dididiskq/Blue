@@ -12,7 +12,7 @@ Item
         id: allBg
         width: srcDict.winWidth
         height: srcDict.winHeight
-        source: "../res/76.svg"
+        source: "../res/newbg.svg"
     }
 
     Component.onCompleted:
@@ -118,6 +118,7 @@ Item
         color: "transparent"
         height: parent.height * 0.15
         width: height
+        visible: !cameraRect.visible
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.leftMargin: srcDict.scaled(25)
@@ -150,6 +151,7 @@ Item
     // 电流
     Rectangle
     {
+        visible: !cameraRect.visible
         color: "transparent"
         height: parent.height * 0.15
         width: height
@@ -186,7 +188,8 @@ Item
     //循环次数
     Rectangle
     {
-
+        // visible: !cameraRect.visible
+        visible: false
         height: parent.height * 0.12
         width: parent.width * 0.4
         anchors.left: parent.left
@@ -233,7 +236,8 @@ Item
     //电池温度
     Rectangle
     {
-
+        // visible: !cameraRect.visible
+        visible: false
         height: parent.height * 0.12
         width: parent.width * 0.4
         anchors.right: parent.right
@@ -281,7 +285,8 @@ Item
     //报警
     Rectangle
     {
-
+        // visible: !cameraRect.visible
+        visible: false
         height: parent.height * 0.12
         width: parent.width * 0.4
         anchors.left: parent.left
@@ -329,6 +334,8 @@ Item
     //压差
     Rectangle
     {
+        // visible: !cameraRect.visible
+        visible: false
         height: parent.height * 0.12
         width: parent.width * 0.4
         anchors.right: parent.right
@@ -368,18 +375,201 @@ Item
                 topMargin: srcDict.scaled(30)
                 leftMargin: srcDict.scaled(100)
             }
-            text: "0"
+            text:  srcDict.yaCha === undefined ? "" : String(srcDict.yaCha)
         }
     }
 
-
-    //连接蓝牙名称
     Rectangle
     {
+        id: param1Rect
+        border.color: "red"
+        color: "transparent"
+        height: 100
+        width: parent.width - 20
+        anchors.top: parent.top
+        anchors.topMargin: 500
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        Rectangle
+        {
+            id: warm1
+            height: parent.height
+            anchors.left: parent.left
+            anchors.verticalCenter: param1Rect.verticalCenter
+            width: param1Rect.width / 4
+            border.color: "red"
+            Image
+            {
+                id: img1
+                height: 80
+                width: 80
+                anchors.horizontalCenter: warm1.horizontalCenter
+                source: "../res/warm.svg"
+            }
+            Label
+            {
+                anchors.top: img1.bottom
+                text: qsTr("电池温度")
+                anchors.horizontalCenter: warm1.horizontalCenter
+            }
+        }
+        Rectangle
+        {
+            id: warm2
+            height: parent.height
+            anchors.left: warm1.right
+            width: param1Rect.width / 4
+            border.color: "red"
+            Label
+            {
+                anchors.top: parent.top
+                anchors.topMargin: 10
+                text: qsTr("T1")
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Label
+            {
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 10
+                text: srcDict.temperature1 === undefined ? "" : srcDict.temperature1
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+        Rectangle
+        {
+            id: warm3
+            height: parent.height
+            width: param1Rect.width / 4
+            anchors.left: warm2.right
+            border.color: "red"
+            Label
+            {
+                anchors.top: parent.top
+                anchors.topMargin: 10
+                text: qsTr("T2")
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Label
+            {
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 10
+                text: srcDict.temperature2 === undefined ? "" : srcDict.temperature2
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+        Rectangle
+        {
+            id: warm4
+            height: parent.height
+            width: param1Rect.width / 4
+            border.color: "red"
+            anchors.left: warm3.right
+            Label
+            {
+                anchors.top: parent.top
+                anchors.topMargin: 10
+                text: qsTr("mos")
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Label
+            {
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 10
+                text: srcDict.mosTemperature === undefined ? "" : srcDict.mosTemperature
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+
+    }
+    Rectangle
+    {
+        id: param2Rect
+        border.color: "red"
+        color: "transparent"
+        height: 100
+        width: parent.width - 20
+        anchors.top: param1Rect.bottom
+        anchors.topMargin: 30
+        anchors.horizontalCenter: parent.horizontalCenter
+        Rectangle
+        {
+            id: bao1
+            height: parent.height
+            anchors.left: parent.left
+            anchors.verticalCenter: param2Rect.verticalCenrter
+            width: param2Rect.width / 3
+            border.color: "red"
+            Image
+            {
+                id: img
+                height: 80
+                width: 80
+                // anchors.verticalCenter: bao1.verticalCenter
+                source: "../res/jingbao.svg"
+            }
+            Label
+            {
+                anchors.top: img.bottom
+                text: qsTr("异常警报")
+            }
+            Label
+            {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: srcDict.alarmlStatus === undefined ? "0" : String(srcDict.alarmlStatus)
+            }
+
+        }
+        Rectangle
+        {
+            id: bao2
+            height: parent.height
+            anchors.left: bao1.right
+            width: param2Rect.width / 3
+            border.color: "red"
+            Image
+            {
+                height: 80
+                width: 80
+                source: "../res/cir.svg"
+            }
+            Label
+            {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: srcDict.cycles_number === undefined ? "0" : srcDict.cycles_number
+            }
+        }
+        Rectangle
+        {
+            id: bao3
+            height: parent.height
+            width: param2Rect.width / 3
+            anchors.left: bao2.right
+            border.color: "red"
+            Image
+            {
+                height: 80
+                width: 80
+                source: "../res/yaChaIcon.svg"
+            }
+            Label
+            {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: srcDict.yaCha === undefined ? "0" : String(srcDict.yaCha)
+            }
+        }
+
+
+    }
+
+    Rectangle
+    {
+        visible: !cameraRect.visible
         id: rectBlueTiele
-        x: 90
         y: 88
-        visible: true
+        anchors.horizontalCenter: parent.horizontalCenter
         width: srcDict.scaled(270)
         height: srcDict.scaled(47)
         color: "transparent"
@@ -387,8 +577,8 @@ Item
         Label
         {
             id: label6
-            x: 70
-            y: 16
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 14
             anchors.centerIn: parent
             text: srcDict.conectedBlueName
@@ -418,324 +608,5 @@ Item
             start()
         }
     }
-
-    // Rectangle
-    // {
-    //     id: rectangle1
-    //     // visible: !cameraRect.visible
-    //     // border.color: "red"
-    //     x: 17
-    //     y: 328
-    //     width: 190
-    //     height: 252
-    //     color: "#ffffff"
-    //     radius: 10
-
-    //     Label
-    //     {
-    //         id: label
-    //         x: 16
-    //         y: 54
-    //         width: 36
-    //         height: 16
-    //         text: qsTr("总电量")
-    //         font.pixelSize: 17
-    //     }
-    //     Image
-    //     {
-    //         x: 18
-    //         y: 14
-    //         width: 43
-    //         height: 43
-    //         source: "../res/electR.png"
-    //     }
-
-    //     Label
-    //     {
-    //         id: label2
-    //         x: 15
-    //         y: 135
-    //         text: qsTr("健康度")
-    //         font.pixelSize: 17
-    //     }
-    //     Image
-    //     {
-    //         x: 18
-    //         y: 94
-    //         width: 41
-    //         height: 41
-    //         source: "../res/heath.png"
-    //     }
-    //     Rectangle
-    //     {
-    //         id: rectRliang
-    //         // visible: !cameraRect.visible
-    //         // border.color: "red"
-    //         x: 72
-    //         y: 15
-    //         width: 100
-    //         height: 56
-    //         color: "#ffffff"
-
-    //         Rectangle
-    //         {
-    //             id: cellShow
-    //             // border.color: "red"
-    //             radius: 10
-    //             x: 7
-    //             y: 11
-    //             width: 85
-    //             height: 35
-    //             color: "#ffffff"
-    //             // 动态填充部分
-    //                Rectangle {
-    //                    id: socFill
-    //                    width: parent.width * (srcDict.soc / 100)
-    //                    height: parent.height
-    //                    radius: parent.radius
-    //                    color: {
-    //                        if(srcDict.soc <= 20) "#ff4444";    // 红色
-    //                        else if(srcDict.soc <= 60) "#ffdd33"; // 黄色
-    //                        else "#77dd77" // 绿色
-    //                    }
-    //                    Behavior on width {
-    //                        NumberAnimation { duration: 500 } // 添加动画效果
-    //                    }
-    //                }
-
-    //                // 显示百分比文本
-    //                Text {
-    //                    anchors.centerIn: parent
-    //                    text: srcDict.soc + "%"
-    //                    font.bold: true
-    //                    z: 1 // 确保文本在填充层上方
-    //                }
-    //         }
-    //     }
-    //     Rectangle
-    //     {
-    //         id: rectHeath
-    //         // visible: !cameraRect.visible
-    //         // border.color: "red"
-    //         x: 72
-    //         y: 95
-    //         width: 100
-    //         height: 56
-    //         color: "#ffffff"
-    //         Rectangle
-    //         {
-    //             id: cellHeathShow
-    //             x: 8
-    //             y: 11
-    //             width: 85
-    //             height: 35
-    //             color: "#ffffff"
-    //             radius: 10
-    //             // border.color: "#ff0000"
-    //             Rectangle {
-    //                     id: sohFill
-    //                     width: parent.width * (srcDict.soh / 100)
-    //                     height: parent.height
-    //                     radius: parent.radius
-    //                     color: {
-    //                         if(srcDict.soh <= 20) "#ff4444";
-    //                         else if(srcDict.soh <= 60) "#ffdd33";
-    //                         else "#77dd77"
-    //                     }
-    //                     Behavior on width {
-    //                         NumberAnimation { duration: 500 }
-    //                     }
-    //                 }
-
-    //                 Text {
-    //                     anchors.centerIn: parent
-    //                     text: srcDict.soh + "%"
-    //                     font.bold: true
-    //                     z: 1
-    //                 }
-    //         }
-    //     }
-    //     Label {
-    //         id: label8
-    //         x: 12
-    //         y: 215
-    //         text: qsTr("电池串数")
-    //         font.pixelSize: 17
-    //     }
-
-    //     Label {
-    //         id: label7
-    //         x: 12
-    //         y: 174
-    //         text: qsTr("电池类型")
-    //         font.pixelSize: 17
-    //     }
-
-    //     Rectangle {
-    //         id: rectangle5
-    //         // border.color: "red"
-    //         x: 84
-    //         y: 170
-    //         width: 88
-    //         height: 30
-    //         color: "#ffffff"
-    //         Text
-    //         {
-    //             anchors.centerIn: parent
-    //             id: name2
-    //             text: srcDict.celllType === undefined ? "" : srcDict.celllType
-    //             // text: "磷酸铁锂"
-    //             font.pixelSize: 20
-    //             color: "#090045"
-    //             font.bold : true
-    //         }
-    //     }
-    //     Rectangle
-    //     {
-    //         id: rectangle6
-    //         // border.color: "red"
-    //         x: 84
-    //         y: 211
-    //         width: 88
-    //         height: 30
-    //         color: "#ffffff"
-    //         Text
-    //         {
-    //             anchors.centerIn: parent
-    //             id: name21
-    //             font.pixelSize: 16
-    //             text: srcDict.cellNum === undefined ? "" : srcDict.cellNum
-    //             // text: "32"
-    //             color: "#090045"
-    //             font.bold : true
-    //         }
-    //     }
-    // }
-
-    // Rectangle
-    // {
-    //     id: rectangle2
-    //     // visible: !cameraRect.visible
-    //     // border.color: "red"
-    //     // x: 220
-    //     y: 328
-    //     anchors.left: parent.left
-    //     anchors.leftMargin: srcDict.scaled(0)
-    //     width: 190
-    //     height: 252
-    //     color: "#ffffff"
-    //     radius: 10
-
-    //     Label
-    //     {
-    //         id: label3
-    //         x: 29
-    //         y: 57
-    //         text: qsTr("总电流")
-    //         font.pixelSize: 17
-    //     }
-    //     Rectangle
-    //     {
-    //         // border.color: "red"
-    //         id: rectLiu
-    //         x: 86
-    //         y: 22
-    //         width: 101
-    //         height: 45
-    //         color: "#ffffff"
-    //         Text
-    //         {
-    //             anchors.centerIn: parent
-    //             id: name3
-    //             font.pixelSize: 16
-    //             // text: "32A"
-    //             text: srcDict.electLiu === undefined ? "" : srcDict.electLiu
-    //             color: "#090045"
-    //             font.bold : true
-    //         }
-    //     }
-    //     Rectangle
-    //     {
-    //         // border.color: "red"
-    //         id: rectYa
-    //         x: 86
-    //         y: 90
-    //         width: 101
-    //         height: 45
-    //         color: "#ffffff"
-    //         Text
-    //         {
-    //             anchors.centerIn: parent
-    //             id: name4
-    //             font.pixelSize: 16
-    //             // text: "32V"
-    //             text: srcDict.electYa === undefined ? "" : srcDict.electYa
-    //             color: "#090045"
-    //             font.bold : true
-    //         }
-    //     }
-    //     Image
-    //     {
-    //         x: 34
-    //         y: 13
-    //         width: 41
-    //         height: 41
-    //         source: "../res/electL.png"
-    //     }
-    //     Label
-    //     {
-    //         id: label1
-    //         x: 29
-    //         y: 125
-    //         text: qsTr("总电压")
-    //         font.pixelSize: 17
-    //     }
-    //     Image
-    //     {
-    //         x: 34
-    //         y: 81
-    //         width: 41
-    //         height: 41
-
-
-    //         source: "../res/electY.png"
-    //     }
-    //     Label
-    //     {
-    //         id: label4
-    //         x: 28
-    //         y: 169
-    //         text: qsTr("充电MOS")
-    //         font.pixelSize: 17
-    //     }
-    //     Image
-    //     {
-    //         x: 117
-    //         y: 157
-    //         width: 42
-    //         height: 40
-    //         source: srcDict.cMos === undefined ?"../res/guan.png" : (srcDict.cMos === 1 ? "../res/kai.png":"../res/guan.png")
-    //         // source: "../res/guan.png"
-    //     }
-
-    //     Label
-    //     {
-    //         id: label5
-    //         x: 28
-    //         y: 220
-    //         text: qsTr("放电MOS")
-    //         font.pixelSize: 17
-    //     }
-    //     Image
-    //     {
-    //         x: 117
-    //         y: 208
-    //         width: 42
-    //         height: 40
-    //         source: srcDict.fMos === undefined ?"../res/guan.png" : (srcDict.fMos === 1 ? "../res/kai.png":"../res/guan.png")
-    //         // source: "../res/kai.png"
-    //     }
-    // }
-
 
 }

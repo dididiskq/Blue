@@ -99,6 +99,7 @@ void CHMViewCommand::initCommands()
     selfCommands["send.to.blue"] = &CHMViewCommand::onSendToBlue;
     selfCommands["send.codeData"] = &CHMViewCommand::onSendCodeData;
     selfCommands["connect.blue"] = &CHMViewCommand::onConnectBlue;
+    selfCommands["get.protectMsg"] = &CHMViewCommand::onGetProtectMsg;
 }
 
 bool CHMViewCommand::isCommand(const QString &command)
@@ -248,5 +249,11 @@ bool CHMViewCommand::onConnectBlue(const QVariantMap &op)
 {
     QString addr = op.value("addr").toString();
     emit connectBlueSlot(addr);
+    return true;
+}
+
+bool CHMViewCommand::onGetProtectMsg(const QVariantMap &op)
+{
+    emit protectMsgSignal();
     return true;
 }

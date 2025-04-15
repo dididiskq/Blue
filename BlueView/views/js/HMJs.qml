@@ -57,6 +57,11 @@ QtObject
     property var majNoElect: fields["majNoElect"] //最近的未充电间隔时间
     property var functionConfig: fields["functionConfig"] //功能开关配置寄存器
     property var cellVlist: fields["cellVlist"] //功能开关配置寄存器
+    property var protectMap: fields["protectMap"]
+
+    property var yaCha: fields["yaCha"]
+    property var maxYa: fields["maxYa"]
+    property var minYa: fields["minYa"]
 
     property var vob: fields["VOB"]
     property var bald: fields["BALD"]
@@ -74,13 +79,14 @@ QtObject
     property var sct: fields["SCT"]
     property var occ: fields["OCC"]
     property var occt: fields["OCCT"]
-    property var shutDownDelay: fields["ShutDownDelay"]
+
     property var eYa: fields["eYa"]
     property var eLiu: fields["eLiu"]
     property var mYa: fields["mYa"]
-    property var mLiu: fields["mLiu"]
-    property var mYan: fields["mYan"]
+    property var mcLiu: fields["mcLiu"]
+    property var manYshi: fields["manYshi"]
     property var sleepDelay: fields["SleepDelay"]
+    property var shutDownDelay: fields["ShutDownDelay"]
     property var sampleRValue: fields["SampleRValue"]
     property var lingYuzhi: fields["lingYuzhi"]
 
@@ -96,13 +102,20 @@ QtObject
     property var motd: fields["MOTD"]
     property var motdr: fields["MOTDR"]
 
+
     property var bt: fields["bt"]
     property var mnfDate: fields["mnfDate"]
     property var customerMode: fields["customerMode"]
     property var customerName: fields["customerName"]
     property var manufacturerMode: fields["manufacturerMode"]
     property var manufacturer: fields["manufacturer"]
+    property var sjCirCount: fields["sjCirCount"]
     property var sn: fields["sn"]
+
+    property int itemIndex: -1
+
+
+
 
     // 动态缩放函数
     function scaled(value)
@@ -140,5 +153,10 @@ QtObject
         var data = {}
         data["addr"] = addr
         putOp("connect.blue", data)
+    }
+    function getProtectMessage()
+    {
+        var data = {}
+        putOp("get.protectMsg", data)
     }
 }

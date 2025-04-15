@@ -16,17 +16,18 @@ Page
         {
             return;
         }
-        returnPage()
+        srcDict.connectBlue(codeData)
     }
     Connections
     {
         target: context
         function onMySignal(message)
         {
-            if(message === "1")
+            if(message !== "1" && message !== "-67" && message !== "-66" && message !== "66")
             {
                 print(codeData + "-已连接")
-                // myLoader.source = "./component/MainPage.qml"
+                srcDict.conectedBlueName = message
+                returnPage()
             }
         }
     }
