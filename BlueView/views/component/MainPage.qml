@@ -7,14 +7,14 @@ Item
     // property var blueData: null
 
     signal hidenTabbar(var type)
+
     Image
     {
         id: allBg
         width: srcDict.winWidth
         height: srcDict.winHeight
-        source: "../res/newbg.svg"
+        source: "../res/104.svg"
     }
-
     Component.onCompleted:
     {
         print("首页加载")
@@ -26,15 +26,34 @@ Item
     BatteryArc
     {
         anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.topMargin: srcDict.scaled(130)
-        anchors.leftMargin: srcDict.scaled(45)
+        // anchors.left: parent.left
+        anchors.topMargin: srcDict.scaled(150)
+        // anchors.leftMargin: srcDict.scaled(45)
+        anchors.horizontalCenter: parent.horizontalCenter
         progress: (srcDict.soc === undefined ? 0 : srcDict.soc * 0.01)
-        lineWidth: 30
+        lineWidth: 10
         backgroundColor: "white"
         progressColor: "#34A853"
         textPrefix: getStatus()// 可调整线宽
+        z: 1
     }
+    Rectangle
+    {
+        height: 250
+        width: parent.width
+
+        anchors.top: parent.top
+        anchors.topMargin: srcDict.scaled(130)
+        anchors.horizontalCenter: parent.horizontalCenter
+        border.color: "red"
+        Image
+        {
+
+            anchors.fill: parent
+            source: "../res/96.svg"
+        }
+    }
+
     function getStatus()
     {
         var res
@@ -116,24 +135,24 @@ Item
     Rectangle
     {
         color: "transparent"
-        height: parent.height * 0.15
-        width: height
+        height: parent.height * 0.16
+        width: height + 10
         visible: !cameraRect.visible
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.leftMargin: srcDict.scaled(25)
-        anchors.topMargin: srcDict.scaled(350)
+        anchors.topMargin: srcDict.scaled(410)
         Image
         {
             anchors.fill: parent
-            source: "../res/yaIcon.svg"
+            source: "../res/102.svg"
         }
         Text
         {
             anchors.centerIn: parent
             font.pixelSize: 20
-            color: "blue"
-            text: String(srcDict.electYa === undefined ? "" : srcDict.electYa)
+            color: "white"
+            text: String(srcDict.electYa === undefined ? "none" : srcDict.electYa)
         }
 
         Label
@@ -142,10 +161,11 @@ Item
             {
                 top: parent.top
                 left: parent.left
-                topMargin: srcDict.scaled(20)
-                leftMargin: srcDict.scaled(30)
+                topMargin: srcDict.scaled(25)
+                leftMargin: srcDict.scaled(48)
             }
-            text: "总电压"
+            color: "white"
+            text: qsTr("电压")
         }
     }
     // 电流
@@ -153,23 +173,23 @@ Item
     {
         visible: !cameraRect.visible
         color: "transparent"
-        height: parent.height * 0.15
-        width: height
+        height: parent.height * 0.16
+        width: height + 10
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.rightMargin: srcDict.scaled(25)
-        anchors.topMargin: srcDict.scaled(350)
+        anchors.topMargin: srcDict.scaled(410)
         Image
         {
             anchors.fill: parent
-            source: "../res/liuIcon.svg"
+            source: "../res/103.svg"
         }
         Text
         {
             anchors.centerIn: parent
             font.pixelSize: 20
-            color: "blue"
-            text: String(srcDict.electLiu === undefined ? "" : srcDict.electLiu)
+            color: "white"
+            text: String(srcDict.electLiu === undefined ? "none" : srcDict.electLiu)
         }
         Label
         {
@@ -177,207 +197,14 @@ Item
             {
                 top: parent.top
                 left: parent.left
-                topMargin: srcDict.scaled(20)
-                leftMargin: srcDict.scaled(33)
+                topMargin: srcDict.scaled(25)
+                leftMargin: srcDict.scaled(48)
             }
-
-            text: "电流"
+            color: "white"
+            text: qsTr("电流")
         }
     }
 
-    //循环次数
-    Rectangle
-    {
-        // visible: !cameraRect.visible
-        visible: false
-        height: parent.height * 0.12
-        width: parent.width * 0.4
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.leftMargin: srcDict.scaled(25)
-        anchors.topMargin: srcDict.scaled(500)
-        Image
-        {
-            height: srcDict.scaled(50)
-            width: srcDict.scaled(50)
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(20)
-                leftMargin: srcDict.scaled(20)
-            }
-            source: "../res/cicleIcon.svg"
-        }
-        Label
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(55)
-                leftMargin: srcDict.scaled(80)
-            }
-
-            text: "循环次数"
-        }
-        Text
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(30)
-                leftMargin: srcDict.scaled(100)
-            }
-            text: String(srcDict.cycles_number === undefined ? "" : srcDict.cycles_number)
-        }
-    }
-    //电池温度
-    Rectangle
-    {
-        // visible: !cameraRect.visible
-        visible: false
-        height: parent.height * 0.12
-        width: parent.width * 0.4
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.rightMargin: srcDict.scaled(25)
-        anchors.topMargin: srcDict.scaled(500)
-        Image
-        {
-            height: srcDict.scaled(50)
-            width: srcDict.scaled(50)
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(20)
-                leftMargin: srcDict.scaled(20)
-            }
-            source: "../res/cellTepmIcon.svg"
-        }
-        Label
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(55)
-                leftMargin: srcDict.scaled(80)
-            }
-
-            text: "电池温度"
-        }
-        Text
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(30)
-                leftMargin: srcDict.scaled(100)
-            }
-            text: srcDict.mosTemperature === undefined ? "" : srcDict.mosTemperature
-        }
-    }
-
-    //报警
-    Rectangle
-    {
-        // visible: !cameraRect.visible
-        visible: false
-        height: parent.height * 0.12
-        width: parent.width * 0.4
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.leftMargin: srcDict.scaled(25)
-        anchors.topMargin: srcDict.scaled(610)
-        Image
-        {
-            height: srcDict.scaled(50)
-            width: srcDict.scaled(50)
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(20)
-                leftMargin: srcDict.scaled(20)
-            }
-            source: "../res/alarmIcon.svg"
-        }
-        Label
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(55)
-                leftMargin: srcDict.scaled(80)
-            }
-
-            text: "异常报警"
-        }
-        Text
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(30)
-                leftMargin: srcDict.scaled(100)
-            }
-            text: String(srcDict.alarmlStatus === undefined ? "" : srcDict.alarmlStatus)
-        }
-    }
-
-    //压差
-    Rectangle
-    {
-        // visible: !cameraRect.visible
-        visible: false
-        height: parent.height * 0.12
-        width: parent.width * 0.4
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.rightMargin: srcDict.scaled(25)
-        anchors.topMargin: srcDict.scaled(610)
-        Image
-        {
-            height: srcDict.scaled(50)
-            width: srcDict.scaled(50)
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(20)
-                leftMargin: srcDict.scaled(20)
-            }
-            source: "../res/yaChaIcon.svg"
-        }
-        Label
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(55)
-                leftMargin: srcDict.scaled(80)
-            }
-            text: "电池压差"
-        }
-        Text
-        {
-            anchors
-            {
-                top: parent.top
-                left: parent.left
-                topMargin: srcDict.scaled(30)
-                leftMargin: srcDict.scaled(100)
-            }
-            text:  srcDict.yaCha === undefined ? "" : String(srcDict.yaCha)
-        }
-    }
 
     Rectangle
     {
@@ -387,7 +214,7 @@ Item
         height: 100
         width: parent.width - 20
         anchors.top: parent.top
-        anchors.topMargin: 500
+        anchors.topMargin: 540
         anchors.horizontalCenter: parent.horizontalCenter
 
         Rectangle
@@ -529,9 +356,15 @@ Item
             border.color: "red"
             Image
             {
+                id: imgCir
                 height: 80
                 width: 80
-                source: "../res/cir.svg"
+                source: "../res/100.svg"
+            }
+            Label
+            {
+                anchors.top: imgCir.bottom
+                text: qsTr("循环次数")
             }
             Label
             {
@@ -549,9 +382,15 @@ Item
             border.color: "red"
             Image
             {
-                height: 80
-                width: 80
-                source: "../res/yaChaIcon.svg"
+                id: imgYc
+                height: 90
+                width: 90
+                source: "../res/101.svg"
+            }
+            Label
+            {
+                anchors.top: imgYc.bottom
+                text: qsTr("压差")
             }
             Label
             {

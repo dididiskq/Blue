@@ -857,9 +857,10 @@ QVariantMap BMSProtocol::deal_0C(const QByteArray &v, int dataLen)
     QVariantMap response;
     int fangStatus = static_cast<quint8>(v[7]) & 1;
     int chongStatus = static_cast<quint8>(v[7]) & 2;
+    int junhengStatus = static_cast<quint8>(v[7]) & 0x80;
     response["fMos"] = fangStatus;
     response["cMos"] = chongStatus;
-
+    response["junhengStatus"] = junhengStatus;
     return response;
 }
 

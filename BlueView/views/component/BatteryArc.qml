@@ -4,8 +4,8 @@ import QtQuick.Shapes
 Item
 {
     id: root
-    width: srcDict.scaled(300)
-    height: srcDict.scaled(300)
+    width: srcDict.scaled(200)
+    height: srcDict.scaled(200)
 
     // 可配置属性
     property real progress: 0.8    // 进度值（0-1）
@@ -35,8 +35,8 @@ Item
             strokeColor: Qt.lighter(root.backgroundColor, 1.2)
             capStyle: ShapePath.RoundCap
             fillColor: "transparent"
-            startX: root.width/2 + root.width/2 * Math.cos(180 * Math.PI/180)
-            startY: root.height/2 + root.height/2 * Math.sin(180 * Math.PI/180)
+            startX: root.width/2 + root.width/2 * Math.cos(270 * Math.PI/180)
+            startY: root.height/2 + root.height/2 * Math.sin(270 * Math.PI/180)
 
             PathAngleArc
             {
@@ -44,8 +44,8 @@ Item
                 centerY: root.height/2
                 radiusX: root.width/2 - root.lineWidth
                 radiusY: root.height/2 - root.lineWidth
-                startAngle: 180 // 起始角度（左上）
-                sweepAngle: 180   // 总角度（270度）
+                startAngle: 135 // 起始角度（左上）
+                sweepAngle: 270     // 总角度（270度）
             }
         }
     }
@@ -60,22 +60,45 @@ Item
             strokeColor: root.progressColor
             capStyle: ShapePath.RoundCap
             fillColor: "transparent"
-            startX: root.width/2 + root.width/2 * Math.cos(180 * Math.PI/180)
-            startY: root.height/2 + root.height/2 * Math.sin(180 * Math.PI/180)
+            startX: root.width/2 + root.width/2 * Math.cos(270 * Math.PI/180)
+            startY: root.height/2 + root.height/2 * Math.sin(270 * Math.PI/180)
 
             PathAngleArc {
                 centerX: root.width/2
                 centerY: root.height/2
                 radiusX: root.width/2 - root.lineWidth
                 radiusY: root.height/2 - root.lineWidth
-                startAngle: 180  // 起始角度
-                sweepAngle: 180 * root.progress // 动态角度
+                startAngle: 135  // 起始角度
+                sweepAngle: 270 * root.progress // 动态角度
             }
         }
     }
+    // 动态指针
+    Rectangle
+    {
+        id: pointer
+        z: 1
+        width: 20
+        height: parent.height / 2 - lineWidth
+        color:  "transparent"
+        anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.verticalCenter  // 将底部锚定到圆心
+            }
+        antialiasing: true
+        border.color: "red"
+        Image
+        {
+            anchors.fill: parent
+            source:"../res/zhizhen.svg"
+        }
 
+        transformOrigin: Item.Bottom
+        rotation:  -135 + 270 * root.progress  // 角度范围：-90°（左）到 90°（右）
+    }
     // 中心文字
     Column {
+        visible: false
         anchors.centerIn: parent
         spacing: 8
 

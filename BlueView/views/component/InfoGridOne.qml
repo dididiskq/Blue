@@ -12,19 +12,23 @@ Row
         height: srcDict.scaled(130)
         color: "transparent"
 
-        Image
+        Rectangle
         {
             height: 50
-            width: 130
-            source: "../res/cellDev.png"
-            anchors
-            {
-                top: parent.top
-                // topMargin: srcDict.scaled(10)
-                // verticalCenter: parent.verticalCenter
-                horizontalCenter: parent.horizontalCenter
+            width: 130 * (srcDict.soc / 100)
+            border.color: "red"
+            radius: 10
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: {
+                if(srcDict.soc <= 20) "#ff4444";    // 红色
+                else if(srcDict.soc <= 60) "#ffdd33"; // 黄色
+                else "#77dd77" // 绿色
+            }
+            Behavior on width {
+                NumberAnimation { duration: 500 } // 添加动画效果
             }
         }
+
         Column
         {
             spacing: 10
@@ -37,19 +41,19 @@ Row
             }
             Label
             {
-                text: "SOC" + srcDict.soc === undefined ? "" : String(srcDict.soc)
+                text: "SOC：" + String(srcDict.soc === undefined ? "none" : srcDict.soc)
                 font.pixelSize: 14
                 color: "#666666"
             }
             Label
             {
-                text: "总容量" + srcDict.fcc === undefined ? "" : String(srcDict.fcc)
+                text: "总容量：" + String(srcDict.fcc === undefined ? "none" : srcDict.fcc)
                 font.pixelSize: 14
                 color: "#666666"
             }
             Label
             {
-                text: "均衡状态"
+                text: "剩余容量：" + String(srcDict.remaining_capacity === undefined ? "none" : srcDict.remaining_capacity)
                 font.pixelSize: 14
                 color: "#666666"
             }
@@ -116,7 +120,7 @@ Row
             {
                 height: 20
                 width: 20
-                source: "../res/guan.png"
+                source: srcDict.junhengStatus === undefined ? "../res/guan.png" : (srcDict.junhengStatus === 1 ? "../res/kai.png" : "../res/guan.png")
             }
         }
 

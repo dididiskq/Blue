@@ -24,6 +24,7 @@ QtObject
     property var electLiu: fields["electLiu"] //总电流
     property var cMos: fields["cMos"] //充电开关
     property var fMos: fields["fMos"] //放电开关
+    property var junhengStatus: fields["junhengStatus"] //均衡状态
     property var mosTemperature: fields["mosTemperature"] //mos温度1
     property var temperature1: fields["temperature1"] //电池温度1
     property var temperature2: fields["temperature2"] //电池温度2

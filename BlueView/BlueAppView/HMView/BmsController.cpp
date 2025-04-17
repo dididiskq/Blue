@@ -626,6 +626,7 @@ void BmsController::BleServiceCharacteristicChanged(const QLowEnergyCharacterist
                 //1表示打开，0表示关闭
                 selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("cMos", map.value("cMos"));
                 selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("fMos", map.value("fMos"));
+                selfObj->selfViewCommand->selfView.context("HMStmView")->setFieldValue("junhengStatus", map.value("junhengStatus"));
             }
             else if(funcCode == 0x0018)
             {
