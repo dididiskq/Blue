@@ -22,7 +22,7 @@ Page
         srcDict.sendToBlue(28)
         srcDict.sendToBlue(29)
         srcDict.sendToBlue(30)
-        srcDict.getProtectMessage()
+        srcDict.getProtectMessage(2)
     }
 
     ScrollView

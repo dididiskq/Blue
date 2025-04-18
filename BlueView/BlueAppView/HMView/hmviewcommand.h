@@ -57,7 +57,7 @@ signals:
     void sendBlueSlot(const int type);
     void connectBlueSlot(const QString addr);
     void writeBlueSlot(const QVariantMap &op);
-    void protectMsgSignal();
+    void protectMsgSignal(const int type);
 public:
     CHMModule *selfObj;
     CHMView selfView;                                             // 界面对象

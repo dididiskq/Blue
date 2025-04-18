@@ -171,7 +171,9 @@ void CHMViewCommand::appendCommand(const QVariantMap &op)
 
 bool CHMViewCommand::onStartSearchBlue(const QVariantMap &op)
 {
+
     emit startBle();
+
     return true;
 }
 
@@ -254,6 +256,7 @@ bool CHMViewCommand::onConnectBlue(const QVariantMap &op)
 
 bool CHMViewCommand::onGetProtectMsg(const QVariantMap &op)
 {
-    emit protectMsgSignal();
+    int type = op.value("type", -1).toInt();
+    emit protectMsgSignal(type);
     return true;
 }

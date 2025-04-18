@@ -6,6 +6,7 @@ Page {
     property var soc: srcDict.soc
     property var soh: srcDict.soh
     property var cellList: srcDict.cellVlist
+
     background: Rectangle
     {
         // color: "transparent"

@@ -444,14 +444,27 @@ void BmsController::sendMsgByQueue()
     }
 }
 
-void BmsController::getProtectMsgSlot()
+void BmsController::getProtectMsgSlot(const int type)
 {
-    for(int i = 1; i <= 24; i++)
+    if(type == 1)
     {
-        int time = 0x418 + 0x2 * (i - 1);
-        int event = 0x448 + 0x2 * (i - 1);
-        viewMessage(time);
-        viewMessage(event);
+        QVector<int> cellVcmdList{32,33,34,35,36,37,38,39,40,
+                               41,42,43,44,45,46,47,48,49,50,51,52,53,54,
+                               55, 56,57,58,59,60,61,62,63};
+        for(const auto& i: cellVcmdList)
+        {
+            viewMessage(i);
+        }
+    }
+    else
+    {
+        for(int i = 1; i <= 24; i++)
+        {
+            int time = 0x418 + 0x2 * (i - 1);
+            int event = 0x448 + 0x2 * (i - 1);
+            viewMessage(time);
+            viewMessage(event);
+        }
     }
 }
 

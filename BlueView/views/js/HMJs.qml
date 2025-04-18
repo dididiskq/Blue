@@ -155,9 +155,10 @@ QtObject
         data["addr"] = addr
         putOp("connect.blue", data)
     }
-    function getProtectMessage()
+    function getProtectMessage(type)
     {
         var data = {}
+        data["type"] = type // 1代表单体电压
         putOp("get.protectMsg", data)
     }
 }

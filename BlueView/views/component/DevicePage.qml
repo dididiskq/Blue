@@ -6,6 +6,23 @@ Page
 
     id: window
     property alias realDrawer: drawer
+    property var realTimer: mainPageTimer
+    Timer
+    {
+        id: mainPageTimer
+        interval: 0       // 初始立即触发
+        repeat: false     // 首次不重复
+        onTriggered:
+        {
+
+            srcDict.getProtectMessage(1)
+            // 调整间隔和重复模式
+            interval = 5000
+            repeat = true
+            start()
+        }
+    }
+
     background: Rectangle
     {
         color: "transparent"  // 完全透明
